@@ -1,0 +1,11 @@
+# .gitignore
+# Ortam Değişkenleri
+.env
+
+# Bağımlılıklar
+node_modules
+packages/*/node_modules
+
+# Üretim ve Loglar
+packages/frontend/dist
+*.log

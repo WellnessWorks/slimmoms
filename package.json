@@ -1,0 +1,34 @@
+{
+  "name": "slimmoms-monorepo",
+  "version": "1.0.0",
+  "description": "Slim mMoms monorepo",
+  "main": "index.js",
+  "scripts": {
+    "start:backend": "npm run start --workspace=backend",
+    "dev:backend": "npm run dev --workspace=backend",
+    "start:frontend": "npm run dev --workspace=frontend",
+    "start:dev": "npm-run-all -p dev:backend start:frontend"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WellnessWorks/slimmoms.git"
+  },
+  "keywords": [
+    "react",
+    "node",
+    "monorepo"
+  ],
+  "author": "",
+  "license": "ISC",
+  "private": true,
+  "bugs": {
+    "url": "https://github.com/WellnessWorks/slimmoms/issues"
+  },
+  "homepage": "https://github.com/WellnessWorks/slimmoms#readme",
+  "workspaces": [
+    "packages/*"
+  ],
+  "devDependencies": {
+    "npm-run-all": "^4.1.5"
+  }
+}
