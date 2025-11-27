@@ -1,3 +1,5 @@
+@import "../../node_modules/modern-normalize/modern-normalize.css";
+
 :root {
   --white: #ffffff;
   --orange: #fc842d;
@@ -53,6 +55,7 @@ a {
 
 input {
   font-family: inherit;
+  outline: none;
 }
 
 .header-text,
