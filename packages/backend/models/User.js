@@ -25,6 +25,29 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: null,
     },
+    dailyCalorieGoal: {
+      type: Number,
+      default: null,
+    }, // Hesaplanan günlük kalori hedefi
+    weight: {
+      type: Number,
+    }, // Mevcut Kilo
+    height: {
+      type: Number,
+    }, // Boy
+    age: {
+      type: Number,
+    }, // Yaş
+    gender: {
+      type: String,
+      enum: ["male", "female"],
+    }, // Cinsiyet
+    activityLevel: {
+      type: String,
+    }, // Aktivite seviyesi
+    targetWeight: {
+      type: Number,
+    }, // ✨ Hedef Kilo (Yeni formül için gerekli)
   },
   {
     timestamps: true, // Oluşturulma/güncellenme zamanlarını otomatik ekler
