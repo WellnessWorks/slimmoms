@@ -1,23 +1,19 @@
 import express from "express";
 import {
-  register,
-  login,
-  logout,
+  registerUser,
+  loginUser,
+  logoutUser,
   refreshTokensController,
-} from "../../../controllers/authController.js";
+} from "../../../controllers/authController.js"; // Controller yolu düzeltildi (../../)
 
 const router = express.Router();
 
-// POST /api/v1/auth/register (Kayıt)
-router.post("/register", register);
+router.post("/register", registerUser);
 
-// POST /api/v1/auth/login (Giriş)
-router.post("/login", login);
+router.post("/login", loginUser);
 
-// POST /api/v1/auth/logout (Çıkış - #3)
-router.post("/logout", logout);
+router.post("/logout", logoutUser);
 
-// POST /api/v1/auth/refresh (Token Yenileme - #12)
 router.post("/refresh", refreshTokensController);
 
 export default router;
