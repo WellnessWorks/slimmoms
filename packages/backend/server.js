@@ -2,6 +2,13 @@ import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
 import calorieRoutes from "./routes/api/v1/calorieRoutes.js";
+import productRoutes from "./routes/api/v1/productRoutes.js";
+import dayRoutes from "./routes/api/v1/dayRoutes.js";
+import swaggerUi from "swagger-ui-express";
+import specs from "./swagger.js";
+import dotenv from "dotenv";
+// Konfigürasyonu yükle
+dotenv.config();
 
 // ✨ 1. ENV CONFIG DOSYASINDAN DEĞİŞKENLERİ TEMİZCE İÇE AKTAR
 import { PORT, MONGODB_URI } from "./config/env.config.js";
@@ -20,6 +27,9 @@ app.use(cors()); // CORS
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/calories", calorieRoutes);
+app.use("/api/v1/products", productRoutes);
+app.use("/api/v1/day", dayRoutes);
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
 
 // Temel deneme rotası
 app.get("/", (req, res) => {

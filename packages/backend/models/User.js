@@ -1,23 +1,24 @@
 import mongoose from "mongoose";
-import bcrypt from "bcryptjs";
+import bcrypt from "bcryptjs"; // bcrypt import edildi
 
+// 1. Şemayı Tanımla
 const userSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: [true, "Please fill in the name field."], // İsim alanı zorunlu
+      required: [true, "Please fill in the name field."],
       trim: true,
     },
     email: {
       type: String,
-      required: [true, "Please enter an email address."], // E-posta zorunlu
-      unique: true, // E-posta benzersiz olmalı
+      required: [true, "Please enter an email address."],
+      unique: true,
       lowercase: true,
       trim: true,
     },
     password: {
       type: String,
-      required: [true, "Please enter a password."], // Şifre zorunlu
+      required: [true, "Please enter a password."],
       minlength: 6,
       select: false, // Şifreyi varsayılan olarak sorgu sonuçlarından gizle
     },
@@ -28,32 +29,51 @@ const userSchema = new mongoose.Schema(
     dailyCalorieGoal: {
       type: Number,
       default: null,
-    }, // Hesaplanan günlük kalori hedefi
+    },
     weight: {
       type: Number,
-    }, // Mevcut Kilo
+    },
     height: {
       type: Number,
-    }, // Boy
+    },
     age: {
       type: Number,
-    }, // Yaş
+    },
     gender: {
       type: String,
       enum: ["male", "female"],
-    }, // Cinsiyet
+    },
     activityLevel: {
       type: String,
-    }, // Aktivite seviyesi
+    },
     targetWeight: {
       type: Number,
-    }, // ✨ Hedef Kilo (Yeni formül için gerekli)
+    },
   },
   {
-    timestamps: true, // Oluşturulma/güncellenme zamanlarını otomatik ekler
+    timestamps: true,
   }
 );
 
-// Model oluşturma
+// 2. Mongoose 'pre' Kancası: Kaydetmeden Önce Şifreyi Hashle
+// YALNIZCA şifre alanı değiştirildiğinde hashler
+userSchema.pre("save", async function (next) {
+  // Şifre değiştirilmediyse veya yeni bir belge değilse sonraki adıma geç
+  if (!this.isModified("password")) {
+    next();
+  }
+
+  // Şifreyi hashle
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
+});
+
+// 3. Metot Ekleme: Şifre Karşılaştırma (Artık doğru yerde)
+userSchema.methods.matchPassword = async function (enteredPassword) {
+  // enteredPassword'ı (düz metin) this.password (hashed) ile karşılaştır
+  return await bcrypt.compare(enteredPassword, this.password);
+};
+
+// 4. Modeli Oluştur ve Export Et
 const User = mongoose.model("User", userSchema);
 export default User;

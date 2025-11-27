@@ -1,120 +1,171 @@
-import * as authService from "../services/authService.js";
+import jwt from "jsonwebtoken";
+import asyncHandler from "express-async-handler";
+import User from "../models/User.js";
+import Session from "../models/Session.js";
+// Eğer logout ve refresh'te authService kullanıyorsanız, buraya dahil edin:
+// import * as authService from '../services/authService.js';
 
-const register = async (req, res, next) => {
-  try {
-    const { name, email, password } = req.body;
+const generateToken = (id) => {
+  return jwt.sign({ id }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRES_IN,
+  });
+};
 
-    // Gelen veriyi kontrol et (daha sonra validator kullanılacak)
-    if (!name || !email || !password) {
-      return res.status(400).json({ message: "All fields are required." });
-    }
+// Yeni Refresh Token oluşturma fonksiyonu
+const generateRefreshToken = (id) => {
+  // JWT_REFRESH_SECRET ve JWT_REFRESH_EXPIRES_IN kullanılıyor
+  return jwt.sign({ id }, process.env.JWT_REFRESH_SECRET, {
+    expiresIn: process.env.JWT_REFRESH_EXPIRES_IN,
+  });
+};
 
-    const user = await authService.registerUser(name, email, password);
+// --- POST /api/v1/auth/register ---
+const registerUser = asyncHandler(async (req, res) => {
+  const { name, email, password } = req.body;
+
+  const userExists = await User.findOne({ email });
+  if (userExists) {
+    res.status(400);
+    throw new Error("User already exists");
+  }
+
+  // Yeni kullanıcı oluşturma (Şifre User.js modelindeki pre('save') hook'unda hashlenir)
+  const user = await User.create({ name, email, password });
+
+  if (user) {
+    const accessToken = generateToken(user._id);
 
     res.status(201).json({
       status: "success",
-      code: 201,
       user: {
+        id: user._id,
         name: user.name,
         email: user.email,
-        // ...
       },
+      accessToken,
     });
-  } catch (error) {
-    // E-posta zaten kullanımda hatası (409 Conflict)
-    if (error.message.includes("already in use")) {
-      return res.status(409).json({ message: error.message });
-    }
-    next(error);
+  } else {
+    res.status(400);
+    throw new Error("Invalid user data");
   }
-};
+});
 
-const login = async (req, res, next) => {
-  try {
-    const { email, password } = req.body;
+// --- POST /api/v1/auth/login ---
+const loginUser = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
 
-    if (!email || !password) {
-      return res
-        .status(400)
-        .json({ message: "Email and password are required." });
-    }
+  const user = await User.findOne({ email }).select("+password");
 
-    // İstek atan kullanıcının IP adresini al
-    const ipAddress = req.ip || req.connection.remoteAddress;
+  if (user && (await user.matchPassword(password))) {
+    // Yeni Access Token oluştur
+    const accessToken = generateToken(user._id);
 
-    // ✨ Login servisini yeni parametrelerle çağır
-    const result = await authService.loginUser(email, password, ipAddress);
+    // Yeni Refresh Token oluştur
+    const refreshToken = generateRefreshToken(user._id);
+
+    // Refresh Token'ın bitiş süresini hesapla (örn: .env'deki değere göre)
+    // JWT_REFRESH_EXPIRES_IN = "30d" olduğu için bu hesaplamayı yapıyoruz.
+    const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+
+    // Eski oturumları temizle (opsiyonel ama iyi güvenlik pratiği)
+    // await Session.deleteMany({ userId: user._id });
+
+    // YENİ Session'ı veritabanına kaydet
+    await Session.create({
+      userId: user._id,
+      refreshToken,
+      expiresAt,
+      ipAddress: req.ip, // Kullanıcının IP adresini al
+    });
 
     res.status(200).json({
       status: "success",
-      code: 200,
-      accessToken: result.accessToken, // Access Token döndür
-      refreshToken: result.refreshToken, // Refresh Token döndür
-      user: result.user,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+      },
+      accessToken,
+      refreshToken, // <-- Yanıta Refresh Token'ı ekleyin
     });
-  } catch (error) {
-    if (error.message.includes("Invalid")) {
-      return res.status(401).json({ message: error.message });
-    }
-    next(error);
+  } else {
+    res.status(401);
+    throw new Error("Invalid email or password.");
   }
-};
+});
 
-const logout = async (req, res, next) => {
-  // ✨ Yeni Logout fonksiyonu (#3)
+// --- POST /api/v1/auth/logout ---
+const logoutUser = asyncHandler(async (req, res) => {
+  // 1. İsteğin body'sinden Refresh Token'ı alın
+  const { refreshToken } = req.body;
+
+  if (!refreshToken) {
+    res.status(400);
+    throw new Error("Refresh token required for logout.");
+  }
+
+  // 2. Token'ı veritabanından bul ve sil
+  const result = await Session.deleteOne({ refreshToken });
+
+  // 3. Yanıt
+  if (result.deletedCount === 0) {
+    // Token bulunamazsa da 204 döndürmek iyi bir pratik olabilir,
+    // ancak hata vermek de isteğe bağlıdır.
+    res.status(404);
+    throw new Error("Session not found.");
+  }
+
+  // Başarılı silme (204 No Content)
+  res.status(204).end();
+});
+
+// --- POST /api/v1/auth/refresh ---
+const refreshTokensController = asyncHandler(async (req, res) => {
+  // 1. İsteğin body'sinden Refresh Token'ı alın
+  const { refreshToken: oldRefreshToken } = req.body;
+
+  if (!oldRefreshToken) {
+    res.status(400);
+    throw new Error("Refresh token required.");
+  }
+
+  // 2. Refresh Token'ı veritabanında bulun
+  const session = await Session.findOne({ refreshToken: oldRefreshToken });
+
+  // Oturum yoksa veya süresi dolmuşsa hata ver
+  if (!session || session.expiresAt < new Date()) {
+    res.status(401);
+    throw new Error("Invalid or expired refresh token.");
+  }
+
+  // 3. Refresh Token'ı doğrula (JWT ile)
+  let decoded;
   try {
-    // Refresh tokenı body'den alınması beklenir
-    const { refreshToken } = req.body;
-
-    if (!refreshToken) {
-      return res
-        .status(400)
-        .json({ message: "Refresh token is required for logout." });
-    }
-
-    await authService.logoutUser(refreshToken);
-
-    // Başarılı oturum sonlandırma
-    res.status(204).end();
+    // Refresh Token'ı doğrulamak için JWT_REFRESH_SECRET kullanılır
+    decoded = jwt.verify(oldRefreshToken, process.env.JWT_REFRESH_SECRET);
   } catch (error) {
-    if (error.message.includes("Invalid")) {
-      return res.status(401).json({ message: error.message });
-    }
-    next(error);
+    // İmza yanlışsa (invalid signature)
+    res.status(401);
+    throw new Error("Invalid refresh token signature.");
   }
-};
 
-const refreshTokensController = async (req, res, next) => {
-  // ✨ Yeni Refresh Token fonksiyonu (#12)
-  try {
-    const { refreshToken: oldRefreshToken } = req.body;
+  // 4. Token yenileme: Yeni token çiftini oluştur
+  const newAccessToken = generateToken(decoded.id);
+  const newRefreshToken = generateRefreshToken(decoded.id);
 
-    if (!oldRefreshToken) {
-      return res.status(400).json({ message: "Refresh token is required." });
-    }
+  // 5. Veritabanındaki oturumu güncelle (Token'ı değiştir ve süreyi uzat)
+  session.refreshToken = newRefreshToken;
+  session.expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 gün uzat
+  // session.ipAddress = req.ip; // Opsiyonel: IP değiştiyse güncelle
+  await session.save();
 
-    const result = await authService.refreshTokens(oldRefreshToken);
+  // 6. Yeni token çiftini yanıtla
+  res.status(200).json({
+    status: "success",
+    accessToken: newAccessToken,
+    refreshToken: newRefreshToken,
+  });
+});
 
-    res.status(200).json({
-      status: "success",
-      code: 200,
-      accessToken: result.accessToken,
-      refreshToken: result.refreshToken,
-    });
-  } catch (error) {
-    if (error.message.includes("Invalid") || error.message.includes("failed")) {
-      // Token geçersiz veya süresi dolmuşsa 403 Forbidden/Unauthorized
-      return res
-        .status(403)
-        .json({ message: "Forbidden. Invalid or expired refresh token." });
-    }
-    next(error);
-  }
-};
-
-export {
-  register,
-  login,
-  logout, // ✨ Export edildi
-  refreshTokensController, // ✨ Export edildi
-};
+// --- Exportlar ---
+export { registerUser, loginUser, logoutUser, refreshTokensController };

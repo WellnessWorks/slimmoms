@@ -1,3 +1,5 @@
+import Product from "../models/Product.js";
+
 // Günlük Aktivite Çarpanları (Genel olarak kullanılan değerler)
 const activityFactors = {
   sedentary: 1.2, // Hareketsiz
@@ -48,10 +50,33 @@ function calculateDailyCalorieIntake(
   return Math.round(Math.max(1000, tdee));
 }
 
-// Önerilmeyen ürünleri belirleme mantığı (Şimdilik yer tutucu)
-function getForbiddenProducts() {
-  // Burası Madde #7'deki ürün verileri gelince güncellenecektir.
-  return ["Sugar", "White Bread", "Fast Food", "Alcohol"];
+/**
+ * Kullanıcının kan grubuna göre YASAKLANMIŞ ürünleri veritabanından bulur.
+ * @param {number} bloodGroup - Kullanıcının kan grubu (1, 2, 3, 4)
+ * @returns {Array} Yasaklanmış ürün başlıklarının listesi
+ */
+async function getForbiddenProducts(bloodGroup) {
+  // ✨ bloodGroup parametresi eklendi
+  // Eğer kan grubu geçersizse, varsayılan listeyi veya boş listeyi döndür (tercih sizin)
+  if (!bloodGroup || bloodGroup < 1 || bloodGroup > 4) {
+    // Bu durumda, genellikle genel olarak yasak olan bazı ürünleri dönebiliriz.
+    // Ama şimdilik sadece kan grubuna göre filtreleme yapacağız.
+    return ["General Forbidden List: Sugar, Alcohol"];
+  }
+
+  // Amaç: groupBloodNotAllowed dizisinde, kullanıcının kan grubu indisine karşılık gelen değerin
+  // TRUE (yasaklı) olduğu ürünleri bulmak.
+
+  // Kan grubu indisine karşılık gelen alanda TRUE olan ürünleri sorgula.
+  let bloodGroupFilter = {};
+  bloodGroupFilter[`groupBloodNotAllowed.${bloodGroup}`] = true;
+
+  const forbiddenItems = await Product.find(bloodGroupFilter)
+    .select("title")
+    .limit(50); // İlk 50 yasaklı ürünü döndür.
+
+  // Sadece ürün başlıklarını içeren bir dizi döndür.
+  return forbiddenItems.map((item) => item.title);
 }
 
 export { calculateDailyCalorieIntake, getForbiddenProducts };

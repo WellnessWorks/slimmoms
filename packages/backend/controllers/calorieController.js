@@ -1,117 +1,125 @@
+import asyncHandler from "express-async-handler"; // Express-async-handler eklendi
 import {
   calculateDailyCalorieIntake,
   getForbiddenProducts,
 } from "../services/calorieService.js";
 import User from "../models/User.js";
 
-// 1. Herkese Açık Hesaplama Rotası (#5)
-const publicCalorieIntake = (req, res, next) => {
-  try {
-    const { weight, height, age, gender, activityLevel, targetWeight } =
-      req.body;
-
-    // Bütün alanlar zorunludur (targetWeight dahil)
-    if (
-      !weight ||
-      !height ||
-      !age ||
-      !gender ||
-      !activityLevel ||
-      !targetWeight
-    ) {
-      return res.status(400).json({
-        message:
-          "Missing required fields for calculation, including targetWeight.",
-      });
-    }
-
-    const dailyRate = calculateDailyCalorieIntake(
-      weight,
-      height,
-      age,
-      gender,
-      activityLevel,
-      targetWeight
+// --- YARDIMCI FONKSİYON: Lojik Tekrarını Önler ---
+const getCalculationData = async (
+  weight,
+  height,
+  age,
+  gender,
+  activityLevel,
+  targetWeight,
+  bloodGroup
+) => {
+  // Gerekli tüm alanların kontrolü
+  if (
+    !weight ||
+    !height ||
+    !age ||
+    !gender ||
+    !activityLevel ||
+    !targetWeight ||
+    !bloodGroup
+  ) {
+    throw new Error(
+      "Missing required fields for calculation, including targetWeight and bloodGroup."
     );
-
-    const forbiddenFoods = getForbiddenProducts();
-
-    res.status(200).json({
-      status: "success",
-      dailyRate,
-      forbiddenFoods,
-    });
-  } catch (error) {
-    // Servis katmanından gelen hataları (örn. Invalid gender) yakalar
-    if (error.message.includes("Invalid gender")) {
-      return res.status(400).json({ message: error.message });
-    }
-    next(error);
   }
+
+  const dailyRate = calculateDailyCalorieIntake(
+    weight,
+    height,
+    age,
+    gender,
+    activityLevel,
+    targetWeight
+  );
+
+  const forbiddenFoods = await getForbiddenProducts(bloodGroup);
+
+  return { dailyRate, forbiddenFoods };
 };
 
-// 2. Özel (Korumalı) Hesaplama Rotası (#6)
-const privateCalorieIntake = async (req, res, next) => {
-  try {
-    // req.user, Yetkilendirme (protect) middleware'i tarafından sağlanır.
-    const userId = req.user._id;
-    const { weight, height, age, gender, activityLevel, targetWeight } =
-      req.body;
+// --- 5. Madde: HERKESE AÇIK Hesaplama Rotası ---
+const publicCalorieIntake = asyncHandler(async (req, res) => {
+  // req.body'den doğrudan alınıyor
+  const {
+    weight,
+    height,
+    age,
+    gender,
+    activityLevel,
+    targetWeight,
+    bloodGroup,
+  } = req.body;
 
-    if (
-      !weight ||
-      !height ||
-      !age ||
-      !gender ||
-      !activityLevel ||
-      !targetWeight
-    ) {
-      return res.status(400).json({
-        message:
-          "Missing required fields for calculation, including targetWeight.",
-      });
-    }
+  // Lojik tekrarını önleyen yardımcı fonksiyonu çağır
+  const { dailyRate, forbiddenFoods } = await getCalculationData(
+    weight,
+    height,
+    age,
+    gender,
+    activityLevel,
+    targetWeight,
+    bloodGroup
+  );
 
-    const dailyRate = calculateDailyCalorieIntake(
-      weight,
-      height,
-      age,
-      gender,
-      activityLevel,
-      targetWeight
-    );
+  res.status(200).json({
+    status: "success",
+    dailyRate,
+    forbiddenFoods,
+  });
+});
 
-    const forbiddenFoods = getForbiddenProducts();
+// --- 6. Madde: ÖZEL (Korumalı) Hesaplama Rotası ---
+const privateCalorieIntake = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
 
-    // ✨ Madde #6'ya göre verileri veritabanındaki User profiline kaydetme
-    await User.findByIdAndUpdate(
-      userId,
-      {
-        $set: {
-          dailyCalorieGoal: dailyRate,
-          weight,
-          height,
-          age,
-          gender,
-          activityLevel,
-          targetWeight,
-        },
+  // Body'den veya veritabanından kan grubunu al
+  const user = await User.findById(userId).select("bloodGroup");
+  const bloodGroup = req.body.bloodGroup || user.bloodGroup;
+
+  const { weight, height, age, gender, activityLevel, targetWeight } = req.body;
+
+  // Lojik tekrarını önleyen yardımcı fonksiyonu çağır
+  const { dailyRate, forbiddenFoods } = await getCalculationData(
+    weight,
+    height,
+    age,
+    gender,
+    activityLevel,
+    targetWeight,
+    bloodGroup
+  );
+
+  // Hesaplanan hedefi ve tüm güncel verileri kullanıcı profiline kaydet (11. Madde'ye hazırlık)
+  await User.findByIdAndUpdate(
+    userId,
+    {
+      $set: {
+        dailyCalorieGoal: dailyRate,
+        weight,
+        height,
+        age,
+        gender,
+        activityLevel,
+        targetWeight,
+        bloodGroup: bloodGroup, // Eğer body'den geliyorsa kaydet/güncelle
       },
-      { new: true }
-    ); // Güncel veriyi döndürmek için new: true kullanılabilir.
+    },
+    { new: true }
+  );
 
-    res.status(200).json({
-      status: "success",
-      dailyRate,
-      forbiddenFoods,
-      message: "Calorie goal saved to profile.",
-    });
-  } catch (error) {
-    if (error.message.includes("Invalid gender")) {
-      return res.status(400).json({ message: error.message });
-    }
-    next(error);
-  }
-};
+  res.status(200).json({
+    status: "success",
+    dailyRate,
+    forbiddenFoods,
+    message: "Calorie goal saved to profile.",
+  });
+});
 
 export { publicCalorieIntake, privateCalorieIntake };
