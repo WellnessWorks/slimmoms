@@ -1,18 +1,27 @@
 import express from "express";
 import {
-  publicCalorieIntake,
-  privateCalorieIntake,
-} from "../../../controllers/calorieController.js";
-import { protect } from "../../../middleware/authMiddleware.js"; // Yetkilendirme katmanı
+  calculateDailyIntake,
+  calculatePrivateDailyIntake,
+} from "../../controllers/calorieController.js";
+import { protect } from "../../middleware/authMiddleware.js";
+import validation from "../../middleware/validationMiddleware.js"; // Import validation
+import { calorieInputSchema } from "../../validation/userValidation.js"; // Import schema
 
 const router = express.Router();
 
-// 1. Herkese açık hesaplama (Token gerekmez) - Madde #5
-// POST /api/v1/calories/intake
-router.post("/intake", publicCalorieIntake);
+// POST /intake rotasına doğrulama eklendi (Herkese açık)
+router.post(
+  "/intake",
+  validation(calorieInputSchema, "body"),
+  calculateDailyIntake
+);
 
-// 2. Korumalı hesaplama ve kaydetme (Token Gerekir) - Madde #6
-// POST /api/v1/calories/private-intake
-router.post("/private-intake", protect, privateCalorieIntake);
+// POST /private-intake rotasına doğrulama eklendi (Korumalı)
+router.post(
+  "/private-intake",
+  protect,
+  validation(calorieInputSchema, "body"),
+  calculatePrivateDailyIntake
+);
 
 export default router;

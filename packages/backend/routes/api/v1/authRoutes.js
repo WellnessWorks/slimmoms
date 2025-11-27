@@ -5,15 +5,29 @@ import {
   logoutUser,
   refreshTokensController,
 } from "../../../controllers/authController.js"; // Controller yolu düzeltildi (../../)
+import validation from "../../middleware/validationMiddleware.js"; // Import the validation middleware
+import {
+  registerSchema,
+  loginSchema,
+  refreshTokenSchema,
+} from "../../validation/authValidation.js"; // Import the schemas
 
 const router = express.Router();
 
-router.post("/register", registerUser);
+// 1. Apply validation to /register
+router.post("/register", validation(registerSchema, "body"), registerUser);
 
-router.post("/login", loginUser);
+// 2. Apply validation to /login
+router.post("/login", validation(loginSchema, "body"), loginUser);
 
-router.post("/logout", logoutUser);
+// 3. Apply validation to /logout
+router.post("/logout", validation(refreshTokenSchema, "body"), logoutUser);
 
-router.post("/refresh", refreshTokensController);
+// 4. Apply validation to /refresh
+router.post(
+  "/refresh",
+  validation(refreshTokenSchema, "body"),
+  refreshTokensController
+);
 
 export default router;

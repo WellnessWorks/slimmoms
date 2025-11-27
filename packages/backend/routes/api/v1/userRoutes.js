@@ -1,17 +1,20 @@
 import express from "express";
-import { getMe, updateUserData } from "../../../controllers/userController.js";
-import { protect } from "../../../middleware/authMiddleware.js";
+import { getMe, updateUserData } from "../../controllers/userController.js";
+import { protect } from "../../middleware/authMiddleware.js";
+import validation from "../../middleware/validationMiddleware.js"; // Import validation
+import { updateUserSchema } from "../../validation/userValidation.js"; // Import schema
 
 const router = express.Router();
 
-// 1. Madde: Kullanıcı Bilgilerini Alma (GET)
-// Endpoint: GET /api/v1/users/me
-// İşlev: protect middleware'i ile yetkilendirilmiş kullanıcının profil verilerini döndürür.
+// GET /me rotasında body veya query olmadığı için doğrulama gerekmez.
 router.get("/me", protect, getMe);
 
-// 2. Madde: Kullanıcı Bilgilerini Güncelleme (PATCH)
-// Endpoint: PATCH /api/v1/users/update
-// İşlev: protect middleware'i ile yetkilendirilmiş kullanıcının profilindeki alanları günceller.
-router.patch("/update", protect, updateUserData);
+// PATCH /update rotasına doğrulama eklendi
+router.patch(
+  "/update",
+  protect,
+  validation(updateUserSchema, "body"),
+  updateUserData
+);
 
 export default router;
