@@ -33,23 +33,26 @@ const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
-    // Gelen veriyi kontrol et
     if (!email || !password) {
       return res
         .status(400)
         .json({ message: "Email and password are required." });
     }
 
-    const result = await authService.loginUser(email, password);
+    // İstek atan kullanıcının IP adresini al
+    const ipAddress = req.ip || req.connection.remoteAddress;
+
+    // ✨ Login servisini yeni parametrelerle çağır
+    const result = await authService.loginUser(email, password, ipAddress);
 
     res.status(200).json({
       status: "success",
       code: 200,
-      token: result.token,
+      accessToken: result.accessToken, // Access Token döndür
+      refreshToken: result.refreshToken, // Refresh Token döndür
       user: result.user,
     });
   } catch (error) {
-    // Kimlik doğrulama hatası (401 Unauthorized)
     if (error.message.includes("Invalid")) {
       return res.status(401).json({ message: error.message });
     }
@@ -57,4 +60,61 @@ const login = async (req, res, next) => {
   }
 };
 
-export { register, login };
+const logout = async (req, res, next) => {
+  // ✨ Yeni Logout fonksiyonu (#3)
+  try {
+    // Refresh tokenı body'den alınması beklenir
+    const { refreshToken } = req.body;
+
+    if (!refreshToken) {
+      return res
+        .status(400)
+        .json({ message: "Refresh token is required for logout." });
+    }
+
+    await authService.logoutUser(refreshToken);
+
+    // Başarılı oturum sonlandırma
+    res.status(204).end();
+  } catch (error) {
+    if (error.message.includes("Invalid")) {
+      return res.status(401).json({ message: error.message });
+    }
+    next(error);
+  }
+};
+
+const refreshTokensController = async (req, res, next) => {
+  // ✨ Yeni Refresh Token fonksiyonu (#12)
+  try {
+    const { refreshToken: oldRefreshToken } = req.body;
+
+    if (!oldRefreshToken) {
+      return res.status(400).json({ message: "Refresh token is required." });
+    }
+
+    const result = await authService.refreshTokens(oldRefreshToken);
+
+    res.status(200).json({
+      status: "success",
+      code: 200,
+      accessToken: result.accessToken,
+      refreshToken: result.refreshToken,
+    });
+  } catch (error) {
+    if (error.message.includes("Invalid") || error.message.includes("failed")) {
+      // Token geçersiz veya süresi dolmuşsa 403 Forbidden/Unauthorized
+      return res
+        .status(403)
+        .json({ message: "Forbidden. Invalid or expired refresh token." });
+    }
+    next(error);
+  }
+};
+
+export {
+  register,
+  login,
+  logout, // ✨ Export edildi
+  refreshTokensController, // ✨ Export edildi
+};
