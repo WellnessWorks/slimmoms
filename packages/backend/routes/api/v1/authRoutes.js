@@ -5,12 +5,12 @@ import {
   logoutUser,
   refreshTokensController,
 } from "../../../controllers/authController.js"; // Controller yolu düzeltildi (../../)
-import validation from "../../middleware/validationMiddleware.js"; // Import the validation middleware
+import validation from "../../../middleware/validationMiddleware.js"; // Import the validation middleware
 import {
   registerSchema,
   loginSchema,
   refreshTokenSchema,
-} from "../../validation/authValidation.js"; // Import the schemas
+} from "../../../validation/authValidation.js"; // Import the schemas
 
 const router = express.Router();
 

@@ -46,6 +46,9 @@ const productSchema = new mongoose.Schema(
 // Arama işlemini hızlandırmak için 'title' alanına indeks ekleyelim.
 productSchema.index({ title: "text" });
 
+// Eğer 'category' alanına göre filtreleme yapılıyorsa:
+productSchema.index({ category: 1 });
+
 const Product = mongoose.model("Product", productSchema);
 
 export default Product;

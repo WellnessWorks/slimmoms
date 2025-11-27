@@ -12,7 +12,8 @@ const userSchema = new mongoose.Schema(
     email: {
       type: String,
       required: [true, "Please enter an email address."],
-      unique: true,
+      // Tekrar eden dizin uyarısını kaldırmak için 'unique: true' kaldırıldı.
+      // Dizin tanımı (unique: true) modelin en altında yapılmıştır.
       lowercase: true,
       trim: true,
     },
@@ -55,10 +56,13 @@ const userSchema = new mongoose.Schema(
   }
 );
 
+// ⚡ Dizini tanımlayarak performansı artırıyoruz ve benzersizliği garanti ediyoruz.
+// Bu, şema içindeki "unique: true" tanımının yerini alır.
+userSchema.index({ email: 1 }, { unique: true });
+
 // 2. Mongoose 'pre' Kancası: Kaydetmeden Önce Şifreyi Hashle
-// YALNIZCA şifre alanı değiştirildiğinde hashler
 userSchema.pre("save", async function (next) {
-  // Şifre değiştirilmediyse veya yeni bir belge değilse sonraki adıma geç
+  // YALNIZCA şifre alanı değiştirildiğinde hashler
   if (!this.isModified("password")) {
     next();
   }
@@ -68,7 +72,7 @@ userSchema.pre("save", async function (next) {
   this.password = await bcrypt.hash(this.password, salt);
 });
 
-// 3. Metot Ekleme: Şifre Karşılaştırma (Artık doğru yerde)
+// 3. Metot Ekleme: Şifre Karşılaştırma
 userSchema.methods.matchPassword = async function (enteredPassword) {
   // enteredPassword'ı (düz metin) this.password (hashed) ile karşılaştır
   return await bcrypt.compare(enteredPassword, this.password);

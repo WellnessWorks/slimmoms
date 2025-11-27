@@ -1,8 +1,8 @@
 import express from "express";
-import { getMe, updateUserData } from "../../controllers/userController.js";
-import { protect } from "../../middleware/authMiddleware.js";
-import validation from "../../middleware/validationMiddleware.js"; // Import validation
-import { updateUserSchema } from "../../validation/userValidation.js"; // Import schema
+import { getMe, updateUserData } from "../../../controllers/userController.js";
+import { protect } from "../../../middleware/authMiddleware.js";
+import validation from "../../../middleware/validationMiddleware.js"; // Import validation
+import { updateUserSchema } from "../../../validation/userValidation.js"; // Import schema
 
 const router = express.Router();
 
