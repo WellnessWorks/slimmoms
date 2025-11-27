@@ -8,7 +8,7 @@ import { PORT, MONGODB_URI } from "./config/env.config.js";
 
 // Diğer router importları
 import authRouter from "./routes/api/v1/authRoutes.js";
-
+import userRoutes from "./routes/api/v1/userRoutes.js";
 const app = express();
 
 // --- Middleware'ler ---
@@ -17,6 +17,7 @@ app.use(cors()); // CORS
 
 // --- Rota Bağlantıları ---
 app.use("/api/v1/auth", authRouter);
+app.use("/api/v1/users", userRoutes);
 
 // Temel deneme rotası
 app.get("/", (req, res) => {
