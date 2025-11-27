@@ -1,30 +1,51 @@
 import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
+import cookieParser from "cookie-parser"; // Cookie desteği için
 import calorieRoutes from "./routes/api/v1/calorieRoutes.js";
 import productRoutes from "./routes/api/v1/productRoutes.js";
 import dayRoutes from "./routes/api/v1/dayRoutes.js";
 import swaggerUi from "swagger-ui-express";
 import specs from "./swagger.js";
 import dotenv from "dotenv";
+import { authLimiter, apiLimiter } from "./middleware/rateLimitMiddleware.js"; // Rate Limitler
+import { errorHandler } from "./middleware/errorMiddleware.js"; // Merkezi Hata İşleyiciler
 // Konfigürasyonu yükle
 dotenv.config();
 
 // ✨ 1. ENV CONFIG DOSYASINDAN DEĞİŞKENLERİ TEMİZCE İÇE AKTAR
 import { PORT, MONGODB_URI } from "./config/env.config.js";
-// NOT: env.config.js dosyasında dotenv yüklemesi yapılmalıdır.
 
 // Diğer router importları
 import authRouter from "./routes/api/v1/authRoutes.js";
 import userRoutes from "./routes/api/v1/userRoutes.js";
+
 const app = express();
 
 // --- Middleware'ler ---
-app.use(express.json()); // JSON Body Parser
-app.use(cors()); // CORS
 
-// --- Rota Bağlantıları ---
-app.use("/api/v1/auth", authRouter);
+// CORS Ayarları (Özellikle Cookie'ler ve Kimlik Bilgileri için önemlidir)
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL || "http://localhost:3000",
+    credentials: true, // Frontend'in Cookie göndermesine izin verir
+  })
+);
+
+app.use(express.json()); // JSON Body Parser
+app.use(cookieParser()); // Gelen isteklerdeki Cookie'leri parse etmek için
+
+// --- Rota Bağlantıları ve Rate Limiting ---
+
+// 1. AUTH Rotalarına Sıkı Limit Uygulama (Bruteforce Koruması)
+app.use("/api/v1/auth", authLimiter, authRouter);
+
+// 2. Diğer Tüm Rotalara Genel Limit Uygulama (DoS Koruması)
+// Bu limit, altındaki tüm rotalar için geçerli olacaktır.
+app.use("/api/v1", apiLimiter);
+
+// 3. Kalan Rota Tanımlamaları
+// Bu rotalar artık apiLimiter tarafından korunmaktadır.
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/calories", calorieRoutes);
 app.use("/api/v1/products", productRoutes);
@@ -36,16 +57,11 @@ app.get("/", (req, res) => {
   res.send("Slimmoms Backend is Running!");
 });
 
-// --- Error Handlers (Hata İşleyiciler) ---
-app.use((req, res) => {
-  res.status(404).json({ message: "Route not found" });
-});
+// --- Hata İşleyiciler ---
+// 404 (Rota Bulunamadı) Hatalarını Yakalama
 
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  const { status = 500, message = "Server error" } = err;
-  res.status(status).json({ message });
-});
+// Merkezi Hata İşleyici (Tüm middleware ve rotalardaki hataları son olarak işler)
+app.use(errorHandler);
 
 // --- Database Connection and Server Start ---
 
