@@ -2,29 +2,31 @@ import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
 import cookieParser from "cookie-parser"; // Cookie desteği için
+import swaggerUi from "swagger-ui-express";
+import dotenv from "dotenv";
+
+// Rota Importları
 import calorieRoutes from "./routes/api/v1/calorieRoutes.js";
 import productRoutes from "./routes/api/v1/productRoutes.js";
 import dayRoutes from "./routes/api/v1/dayRoutes.js";
-import swaggerUi from "swagger-ui-express";
+import authRouter from "./routes/api/v1/authRoutes.js";
+import userRoutes from "./routes/api/v1/userRoutes.js";
+
 import specs from "./swagger.js";
-import dotenv from "dotenv";
-//import { authLimiter, apiLimiter } from "./middleware/rateLimitMiddleware.js"; // Rate Limitler
+// Middleware Importları
 import { errorHandler } from "./middleware/errorMiddleware.js"; // Merkezi Hata İşleyiciler
+
 // Konfigürasyonu yükle
 dotenv.config();
 
 // ✨ 1. ENV CONFIG DOSYASINDAN DEĞİŞKENLERİ TEMİZCE İÇE AKTAR
 import { PORT, MONGODB_URI } from "./config/env.config.js";
 
-// Diğer router importları
-import authRouter from "./routes/api/v1/authRoutes.js";
-import userRoutes from "./routes/api/v1/userRoutes.js";
-
 const app = express();
 
 // --- Middleware'ler ---
 
-// CORS Ayarları (Özellikle Cookie'ler ve Kimlik Bilgileri için önemlidir)
+// CORS Ayarları
 app.use(
   cors({
     origin: process.env.FRONTEND_URL || "http://localhost:3000",
@@ -35,30 +37,28 @@ app.use(
 app.use(express.json()); // JSON Body Parser
 app.use(cookieParser()); // Gelen isteklerdeki Cookie'leri parse etmek için
 
-// --- Rota Bağlantıları ve Rate Limiting ---
+// --- Rota Bağlantıları ---
 
-// 1. AUTH Rotalarına Sıkı Limit Uygulama (Bruteforce Koruması)
-//app.use("/api/v1/auth", authLimiter, authRouter);
+// 1. AUTH Rotaları (Kayıt, Giriş, Çıkış, Yenileme)
+// authLimiter devre dışı bırakıldığı için sadece router'ı bağlıyoruz.
+app.use("/api/v1/auth", authRouter);
 
-// 2. Diğer Tüm Rotalara Genel Limit Uygulama (DoS Koruması)
-// Bu limit, altındaki tüm rotalar için geçerli olacaktır.
-//app.use("/api/v1", apiLimiter);
-
-// 3. Kalan Rota Tanımlamaları
-// Bu rotalar artık apiLimiter tarafından korunmaktadır.
+// 2. Kalan Rota Tanımlamaları
+// Bu rotaların hepsi /api/v1 altındadır.
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/calories", calorieRoutes);
 app.use("/api/v1/products", productRoutes);
 app.use("/api/v1/day", dayRoutes);
+
+// 3. Dokümantasyon Rotası
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
 
-// Temel deneme rotası
+// Temel deneme rotası (Sunucu canlı mı kontrolü)
 app.get("/", (req, res) => {
   res.send("Slimmoms Backend is Running!");
 });
 
 // --- Hata İşleyiciler ---
-// 404 (Rota Bulunamadı) Hatalarını Yakalama
 
 // Merkezi Hata İşleyici (Tüm middleware ve rotalardaki hataları son olarak işler)
 app.use(errorHandler);
