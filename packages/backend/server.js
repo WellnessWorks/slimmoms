@@ -8,7 +8,7 @@ import dayRoutes from "./routes/api/v1/dayRoutes.js";
 import swaggerUi from "swagger-ui-express";
 import specs from "./swagger.js";
 import dotenv from "dotenv";
-import { authLimiter, apiLimiter } from "./middleware/rateLimitMiddleware.js"; // Rate Limitler
+//import { authLimiter, apiLimiter } from "./middleware/rateLimitMiddleware.js"; // Rate Limitler
 import { errorHandler } from "./middleware/errorMiddleware.js"; // Merkezi Hata İşleyiciler
 // Konfigürasyonu yükle
 dotenv.config();
@@ -38,11 +38,11 @@ app.use(cookieParser()); // Gelen isteklerdeki Cookie'leri parse etmek için
 // --- Rota Bağlantıları ve Rate Limiting ---
 
 // 1. AUTH Rotalarına Sıkı Limit Uygulama (Bruteforce Koruması)
-app.use("/api/v1/auth", authLimiter, authRouter);
+//app.use("/api/v1/auth", authLimiter, authRouter);
 
 // 2. Diğer Tüm Rotalara Genel Limit Uygulama (DoS Koruması)
 // Bu limit, altındaki tüm rotalar için geçerli olacaktır.
-app.use("/api/v1", apiLimiter);
+//app.use("/api/v1", apiLimiter);
 
 // 3. Kalan Rota Tanımlamaları
 // Bu rotalar artık apiLimiter tarafından korunmaktadır.
