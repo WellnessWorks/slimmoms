@@ -30,7 +30,18 @@ const app = express();
 // Localhost için ve Vercel frontend için izin ver
 app.use(
   cors({
-    origin: ["http://localhost:3000", "https://slimmoms-frontend.vercel.app"],
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true); // Postman veya SSR isteği için
+      if (
+        [
+          "http://localhost:3000",
+          "https://slimmoms-frontend.vercel.app",
+        ].includes(origin)
+      ) {
+        return callback(null, true); // İzin ver
+      }
+      return callback(null, false); // İzin yoksa sadece false döndür
+    },
     credentials: true,
   })
 );
