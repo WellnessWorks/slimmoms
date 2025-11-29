@@ -16,6 +16,12 @@ router.post(
   publicCalorieIntake
 );
 
+// Debug route: GET /debug/forbidden/:group
+router.get("/debug/forbidden/:group", (req, res, next) => {
+  // Lazy-load controller to avoid circular issues
+  import("../../../controllers/calorieController.js").then(mod => mod.debugForbiddenProducts(req, res, next)).catch(next);
+});
+
 // POST /private-intake rotasına (Korumalı)
 router.post(
   "/private-intake",
