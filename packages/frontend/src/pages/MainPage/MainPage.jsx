@@ -53,7 +53,7 @@ const MainPage = () => {
       gender: "male",
       activityLevel: activityLevelMultiplier,
     };
-    const API_URL = "http://localhost:4000/api/v1/calories/intake";
+    const API_URL = "https://slimmoms-j4sf.onrender.com/api/v1/calories/intake";
 
     try {
       console.log("Gönderilen Veri (Final):", requestBody);
