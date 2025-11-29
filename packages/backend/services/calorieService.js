@@ -24,8 +24,7 @@ function calculateDailyCalorieIntake(
   let bmrAdjustment; // BMR + Hedef Ayarlaması
 
   if (gender === "female") {
-    // ✨ KADINLAR İÇİN ÖZEL FORMÜL:
-    // (10 * ağırlık) + (6.25 * boy) - (5 * yaş) - 161 - 10 * (ağırlık - istenen ağırlık)
+    // KADINLAR İÇİN ÖZEL FORMÜL:
     bmrAdjustment =
       10 * weight +
       6.25 * height -
@@ -34,49 +33,40 @@ function calculateDailyCalorieIntake(
       10 * (weight - targetWeight);
   } else if (gender === "male") {
     // ERKEKLER İÇİN (Standart Mifflin-St Jeor)
-    // Eğer erkekler için de hedef kilo ayarlaması isterseniz, burayı güncelleriz.
     bmrAdjustment = 10 * weight + 6.25 * height - 5 * age + 5;
   } else {
     throw new Error("Invalid gender specified.");
   }
 
-  // Aktivite çarpanını al
-  const factor = activityFactors[activityLevel] || activityFactors.sedentary;
+  const factor =
+    activityFactors[activityLevel] ||
+    Number(activityLevel) ||
+    activityFactors.sedentary;
 
-  // Toplam Günlük Enerji Harcaması (TDEE)
   const tdee = bmrAdjustment * factor;
 
-  // Kalori miktarının minimum sağlıklı sınırın altına düşmemesini sağla (Örn: 1000 Kcal)
   return Math.round(Math.max(1000, tdee));
 }
 
 /**
- * Kullanıcının kan grubuna göre YASAKLANMIŞ ürünleri veritabanından bulur.
+ * Kan Grubuna göre YASAKLANMIŞ ürünleri veritabanından bulur ve 5 ile sınırlar.
  * @param {number} bloodGroup - Kullanıcının kan grubu (1, 2, 3, 4)
- * @returns {Array} Yasaklanmış ürün başlıklarının listesi
+ * @returns {Array} Yasaklanmış ürün başlıklarının listesi (Sadece ilk 5 tanesi)
  */
 async function getForbiddenProducts(bloodGroup) {
-  // ✨ bloodGroup parametresi eklendi
-  // Eğer kan grubu geçersizse, varsayılan listeyi veya boş listeyi döndür (tercih sizin)
   if (!bloodGroup || bloodGroup < 1 || bloodGroup > 4) {
-    // Bu durumda, genellikle genel olarak yasak olan bazı ürünleri dönebiliriz.
-    // Ama şimdilik sadece kan grubuna göre filtreleme yapacağız.
-    return ["General Forbidden List: Sugar, Alcohol"];
+    return [];
   }
+  const query = {};
+  query[`groupBloodNotAllowed.${bloodGroup}`] = true;
 
-  // Amaç: groupBloodNotAllowed dizisinde, kullanıcının kan grubu indisine karşılık gelen değerin
-  // TRUE (yasaklı) olduğu ürünleri bulmak.
-
-  // Kan grubu indisine karşılık gelen alanda TRUE olan ürünleri sorgula.
-  let bloodGroupFilter = {};
-  bloodGroupFilter[`groupBloodNotAllowed.${bloodGroup}`] = true;
-
-  const forbiddenItems = await Product.find(bloodGroupFilter)
-    .select("title")
-    .limit(50); // İlk 50 yasaklı ürünü döndür.
-
-  // Sadece ürün başlıklarını içeren bir dizi döndür.
-  return forbiddenItems.map((item) => item.title);
+  try {
+    const matched = await Product.find(query).select("title").limit(5);
+    return matched.map((item) => item.title);
+  } catch (error) {
+    console.error("Error fetching forbidden products:", error);
+    return [];
+  }
 }
 
 export { calculateDailyCalorieIntake, getForbiddenProducts };

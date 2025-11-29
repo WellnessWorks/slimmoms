@@ -110,12 +110,13 @@ input[type="radio"]:checked + label,
 
 .calculation-btn {
   border-radius: 30px;
-  padding: 13px 49px;
+  padding: 13px 25px;
   width: 210px;
   height: 43px;
   box-shadow: 0 4px 10px 0 var(--shadow-orange);
   background: var(--orange);
   color: var(--white);
+  border: none;
 }
 
 .modal-calorie-text {

@@ -1,0 +1,135 @@
+.contentBox {
+  background-color: var(--white);
+  padding: 20px;
+  margin-bottom: 40px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.intakeTitle {
+  margin: 40px 20px 42px 20px;
+}
+
+.closeButton {
+  display: block;
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  right: auto;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #000000;
+  line-height: 1;
+}
+
+.rateBox {
+  display: flex;
+  align-items: flex-end;
+  padding-bottom: 32px;
+  border-bottom: 1px solid #e0e0e0;
+  width: 100%;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.dailyRate {
+  color: var(--dark-gray);
+  line-height: 1;
+  margin-right: 5px;
+}
+
+.unit {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--dark-gray);
+  padding-bottom: 4px;
+}
+
+.divider {
+  border: none;
+  width: 100%;
+  margin: 0;
+}
+
+.subtitle {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--dark-gray);
+  margin-top: 0;
+  margin-bottom: 20px;
+  align-self: flex-start;
+}
+
+.foodList {
+  list-style-type: decimal;
+  list-style-position: outside;
+  padding-left: 20px;
+  margin-bottom: 0;
+  margin-top: 0;
+  width: 100%;
+  align-self: flex-start;
+}
+
+.foodItem {
+  font-size: 14px;
+  color: var(--dark-gray);
+  line-height: 1.5;
+  margin-left: 5px;
+}
+
+.foodItem:not(:last-child) {
+  margin-bottom: 10px;
+}
+
+.noFoodItem {
+  font-size: 14px;
+  color: var(--light-gray);
+  list-style: none;
+  margin-left: 0;
+}
+
+.submitBtn {
+  white-space: nowrap;
+  padding: 13px 25px;
+  width: 210px;
+  height: 43px;
+  display: block;
+  margin: 20px auto 0;
+  padding: 10px 20px;
+  background-color: var(--accent, #fc842d);
+  color: #fff;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+@media (min-width: 768px) {
+  .modalContent {
+    width: 450px;
+    max-width: none;
+    padding: 50px 30px 30px 30px;
+    margin: auto;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .closeButton {
+    display: block;
+    position: absolute;
+    right: 30px;
+    top: 30px;
+    left: auto;
+  }
+
+  .subtitle {
+    align-self: flex-start;
+  }
+
+  .foodList {
+    align-self: flex-start;
+  }
+}

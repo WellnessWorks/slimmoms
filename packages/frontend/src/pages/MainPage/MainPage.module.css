@@ -1,0 +1,10 @@
+.mainPageWrapper {
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+.mainContent {
+    padding-top: 52px; 
+    padding-left: 20px;
+    padding-right: 20px;
+}
