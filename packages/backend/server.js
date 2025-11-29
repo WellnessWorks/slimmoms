@@ -27,10 +27,11 @@ const app = express();
 // --- Middleware'ler ---
 
 // CORS Ayarları
+// Localhost için ve Vercel frontend için izin ver
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:3000",
-    credentials: true, // Frontend'in Cookie göndermesine izin verir
+    origin: ["http://localhost:3000", "https://slimmoms-frontend.vercel.app"],
+    credentials: true,
   })
 );
 
