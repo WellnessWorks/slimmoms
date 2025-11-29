@@ -31,18 +31,20 @@ const app = express();
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin) return callback(null, true); // Postman veya SSR isteği için
-      if (
-        [
-          "http://localhost:3000",
-          "https://slimmoms-frontend.vercel.app",
-        ].includes(origin)
-      ) {
+      // Eğer origin yoksa (Postman veya SSR) izin ver
+      if (!origin) return callback(null, true);
+
+      // İzin verilen production frontend domain
+      const whitelist = ["https://slimmoms-frontend.vercel.app"];
+
+      if (whitelist.includes(origin)) {
         return callback(null, true); // İzin ver
       }
-      return callback(null, false); // İzin yoksa sadece false döndür
+
+      // İzin yoksa preflight request'i engelleme
+      return callback(null, false);
     },
-    credentials: true,
+    credentials: true, // Cookie veya auth header kullanıyorsan gerekli
   })
 );
 
