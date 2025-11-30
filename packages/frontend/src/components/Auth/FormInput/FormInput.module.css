@@ -1,0 +1,29 @@
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+.inputWrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.formInput {
+  width: 280px;
+  height: 36px;
+  border: none;
+  border-bottom: 1px solid var(--light-gray);
+  outline: none;
+}
+
+@media (min-width: 768px) {
+  .formInput {
+    width: 240px;
+  }
+}
