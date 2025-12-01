@@ -1,0 +1,96 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Satır – desktop’ta yan yana, mobilde alt alta */
+.row {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+}
+
+.fullWidth {
+  width: 100%;
+}
+
+.label {
+  font-size: 14px;
+  color: #9b9faa;
+  margin-bottom: 8px;
+}
+
+/* Input stili – sadece alt çizgi */
+.input {
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 4px 0 6px;
+  font-size: 16px;
+  outline: none;
+}
+
+.input:focus {
+  border-bottom-color: #fc842d;
+}
+
+/* Hata yazısı */
+.error {
+  margin-top: 4px;
+  font-size: 12px;
+  color: #e53935;
+}
+
+/* Kan grubu radyo butonları */
+.radioGroup {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.radioLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+}
+
+/* Turuncu buton */
+.button {
+  align-self: flex-start;
+  margin-top: 16px;
+  padding: 12px 32px;
+  border-radius: 30px;
+  border: none;
+  background-color: #fc842d;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.button:hover {
+  opacity: 0.9;
+}
+
+/* TABLET üstü – inputları yan yana diz */
+@media (min-width: 768px) {
+  .row {
+    flex-direction: row;
+  }
+
+  .field {
+    flex: 1;
+  }
+
+  .button {
+    margin-top: 24px;
+  }
+}
