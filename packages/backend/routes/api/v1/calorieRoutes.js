@@ -1,15 +1,16 @@
 import express from "express";
 import {
-  publicCalorieIntake, // <-- Düzeltilmiş isim
-  privateCalorieIntake, // <-- Düzeltilmiş isim
+  publicCalorieIntake,
+  privateCalorieIntake,
+  getUserCalorieProfile, // 🔴 yeni import
 } from "../../../controllers/calorieController.js";
 import { protect } from "../../../middleware/authMiddleware.js";
-import validation from "../../../middleware/validationMiddleware.js"; // Import validation
-import { calorieInputSchema } from "../../../validation/userValidation.js"; // Import schema
+import validation from "../../../middleware/validationMiddleware.js";
+import { calorieInputSchema } from "../../../validation/userValidation.js";
 
 const router = express.Router();
 
-// POST /intake rotasına (Herkese açık)
+// POST /intake (herkese açık)
 router.post(
   "/intake",
   validation(calorieInputSchema, "body"),
@@ -18,16 +19,20 @@ router.post(
 
 // Debug route: GET /debug/forbidden/:group
 router.get("/debug/forbidden/:group", (req, res, next) => {
-  // Lazy-load controller to avoid circular issues
-  import("../../../controllers/calorieController.js").then(mod => mod.debugForbiddenProducts(req, res, next)).catch(next);
+  import("../../../controllers/calorieController.js")
+    .then((mod) => mod.debugForbiddenProducts(req, res, next))
+    .catch(next);
 });
 
-// POST /private-intake rotasına (Korumalı)
+// POST /private-intake (korumalı, token zorunlu)
 router.post(
   "/private-intake",
   protect,
   validation(calorieInputSchema, "body"),
   privateCalorieIntake
 );
+
+// 🔴 YENİ: GET /me → giriş yapmış kullanıcının kalori profilini döner
+router.get("/me", protect, getUserCalorieProfile);
 
 export default router;
