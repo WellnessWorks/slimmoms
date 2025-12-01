@@ -10,7 +10,7 @@ import {
 } from "../../../redux/auth/authSelectors.js";
 import { useDispatch, useSelector } from "react-redux";
 import { clearAuthError } from "../../../redux/auth/authSlice.js";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { logIn } from "../../../redux/auth/authOperations.js";
 
 // Validasyon şeması
@@ -38,6 +38,8 @@ const LoginForm = () => {
   const emailFieldId = useId();
   const passwordFieldId = useId();
   const dispatch = useDispatch();
+  const navigate = useNavigate(); // ✅ BURADA OLMALI
+
   const isLoading = useSelector(selectIsLoading);
   const authError = useSelector(selectError);
 
@@ -51,8 +53,7 @@ const LoginForm = () => {
     defaultValues: initialValues,
   });
 
-  //Hata Durumu Temizleme
-
+  // Hata Durumu Temizleme
   useEffect(() => {
     return () => {
       dispatch(clearAuthError());
@@ -63,9 +64,9 @@ const LoginForm = () => {
     try {
       await dispatch(logIn(values)).unwrap();
       reset();
+      navigate("/diary"); // Başarılı login sonrası yönlendirme
     } catch {
-      // Hata yönetimi Redux state'i (authError) tarafından yapılıyor.
-      //Bu catch bloğu .unwrap() fırlattığında uygulamanın çökmesini engeller.
+      // hata redux tarafından yönetiliyor
     }
   };
 
@@ -91,7 +92,9 @@ const LoginForm = () => {
             register={register("password")}
             error={errors.password?.message}
           />
+
           {authError && <p className={css.authErrorMessage}>{authError}</p>}
+
           <div className={css.loginButtonWrapper}>
             <button type="submit" disabled={isLoading} className="btn-primary">
               {isLoading ? "Loading..." : "Log In"}
