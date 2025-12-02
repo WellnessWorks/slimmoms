@@ -160,7 +160,7 @@ const CalculatorForm = ({ onSubmit }) => {
         </div>
       </div>
 
-      {/* Current weight + Activity level yan yana (tablet & desktop) */}
+      {/* Current weight + Activity level yan yana */}
       <div className={styles.row}>
         <div className={styles.field}>
           <label className={styles.label}>Current weight *</label>
@@ -190,11 +190,19 @@ const CalculatorForm = ({ onSubmit }) => {
             <option value="" disabled>
               Select activity level
             </option>
-            <option value="1.2">Minimum</option>
-            <option value="1.375">Low</option>
-            <option value="1.55">Medium</option>
-            <option value="1.725">High</option>
-            <option value="1.9">Maximum</option>
+            <option value="1.2">Minimum (Sedentary)</option>
+            <option value="1.375">
+              Low (Light exercise 1–3 times/week)
+            </option>
+            <option value="1.55">
+              Medium (Moderate exercise 3–5 times/week)
+            </option>
+            <option value="1.725">
+              High (Hard exercise 6–7 times/week)
+            </option>
+            <option value="1.9">
+              Maximum (Daily intense exercise or job)
+            </option>
           </select>
           {errors.activityLevel && (
             <div className={styles.warning}>
