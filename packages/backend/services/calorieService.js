@@ -31,9 +31,6 @@ function calculateDailyCalorieIntake(
       5 * age -
       161 -
       10 * (weight - targetWeight);
-  } else if (gender === "male") {
-    // ERKEKLER İÇİN (Standart Mifflin-St Jeor)
-    bmrAdjustment = 10 * weight + 6.25 * height - 5 * age + 5;
   } else {
     throw new Error("Invalid gender specified.");
   }
@@ -49,19 +46,23 @@ function calculateDailyCalorieIntake(
 }
 
 /**
- * Kan Grubuna göre YASAKLANMIŞ ürünleri veritabanından bulur ve 5 ile sınırlar.
+ * Kan Grubuna göre YASAKLANMIŞ ürünleri veritabanından bulur ve 5 tanesini RASTGELE seçer.
  * @param {number} bloodGroup - Kullanıcının kan grubu (1, 2, 3, 4)
- * @returns {Array} Yasaklanmış ürün başlıklarının listesi (Sadece ilk 5 tanesi)
+ * @returns {Array} Yasaklanmış ürün başlıklarının listesi (Sadece rastgele 5 tanesi)
  */
 async function getForbiddenProducts(bloodGroup) {
   if (!bloodGroup || bloodGroup < 1 || bloodGroup > 4) {
     return [];
   }
-  const query = {};
-  query[`groupBloodNotAllowed.${bloodGroup}`] = true;
+  const matchQuery = {};
+  matchQuery[`groupBloodNotAllowed.${bloodGroup}`] = true;
 
   try {
-    const matched = await Product.find(query).select("title").limit(5);
+    const matched = await Product.aggregate([
+      { $match: matchQuery },
+      { $sample: { size: 5 } },
+      { $project: { title: 1, _id: 0 } },
+    ]);
     return matched.map((item) => item.title);
   } catch (error) {
     console.error("Error fetching forbidden products:", error);

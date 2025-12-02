@@ -16,6 +16,15 @@ const ACTIVITY_LEVELS = [
   { label: "Maximum (Daily intense exercise or job)", value: "1.9" },
 ];
 
+const NUMERIC_FIELDS = ["height", "age", "currentWeight", "desiredWeight"];
+
+const FIELD_RULES = {
+  height: { min: 100,max: 250, maxLength: 3 },
+  age: { min: 18, max: 100, maxLength: 3 },
+  currentWeight: {min: 20, max: 500, maxLength: 3 },
+  desiredWeight: { min: 20, max: 500, maxLength: 3 },
+};
+
 const validateForm = (data) => {
   const errors = {};
   const parsedData = {};
@@ -82,10 +91,32 @@ const DailyCaloriesForm = ({ onFormSubmit, isLoading }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    let finalValue = value;
+
+    if (NUMERIC_FIELDS.includes(name)) {
+      if (value === "") {
+        finalValue = "";
+      } else {
+        finalValue = value.replace(/[^0-9]/g, "").replace(/^0+/, "");
+        if (finalValue === "") {
+          return;
+        }
+
+        const rule = FIELD_RULES[name];
+        if (rule) {
+          const numericValue = parseInt(finalValue, 10);
+          if (numericValue > rule.max) {
+            finalValue = String(rule.max);
+          } else if (rule.maxLength && finalValue.length > rule.maxLength) {
+            finalValue = finalValue.slice(0, rule.maxLength);
+          }
+        }
+      }
+    }
 
     setFormData((prevData) => ({
       ...prevData,
-      [name]: value,
+      [name]: finalValue,
     }));
 
     if (errors[name]) {
@@ -94,6 +125,42 @@ const DailyCaloriesForm = ({ onFormSubmit, isLoading }) => {
         delete newErrors[name];
         return newErrors;
       });
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if (!NUMERIC_FIELDS.includes(e.target.name)) {
+      return;
+    }
+
+    const allowedControlKeys = [
+      "Backspace",
+      "Delete",
+      "ArrowLeft",
+      "ArrowRight",
+      "Tab",
+      "Home",
+      "End",
+    ];
+
+    if (
+      allowedControlKeys.includes(e.key) ||
+      e.metaKey ||
+      e.ctrlKey ||
+      e.altKey
+    ) {
+      return;
+    }
+
+    if (!/^[0-9]$/.test(e.key)) {
+      e.preventDefault();
+      return;
+    }
+
+    const { selectionStart, selectionEnd, value } = e.target;
+    const insertingAtStart = selectionStart === 0 && selectionEnd === 0;
+    if (e.key === "0" && insertingAtStart && value.length === 0) {
+      e.preventDefault();
     }
   };
 
@@ -133,11 +200,15 @@ const DailyCaloriesForm = ({ onFormSubmit, isLoading }) => {
             className={`${css.inputField} ${
               errors.height ? css.inputError : ""
             }`}
-            type="number"
+            type="text"
             name="height"
             placeholder="Height *"
+            inputMode="numeric"
+            pattern="[1-9][0-9]*"
+            maxLength={FIELD_RULES.height.maxLength}
             value={formData.height}
             onChange={handleChange}
+            onKeyDown={handleKeyDown}
           />
           {errors.height && (
             <span className={css.errorMessage}>{errors.height}</span>
@@ -147,11 +218,15 @@ const DailyCaloriesForm = ({ onFormSubmit, isLoading }) => {
         <div className={css.inputGroup}>
           <input
             className={`${css.inputField} ${errors.age ? css.inputError : ""}`}
-            type="number"
+            type="text"
             name="age"
             placeholder="Age *"
+            inputMode="numeric"
+            pattern="[1-9][0-9]*"
+            maxLength={FIELD_RULES.age.maxLength}
             value={formData.age}
             onChange={handleChange}
+            onKeyDown={handleKeyDown}
           />
           {errors.age && <span className={css.errorMessage}>{errors.age}</span>}
         </div>
@@ -161,11 +236,15 @@ const DailyCaloriesForm = ({ onFormSubmit, isLoading }) => {
             className={`${css.inputField} ${
               errors.currentWeight ? css.inputError : ""
             }`}
-            type="number"
+            type="text"
             name="currentWeight"
             placeholder="Current Weight *"
+            inputMode="numeric"
+            pattern="[1-9][0-9]*"
+            maxLength={FIELD_RULES.currentWeight.maxLength}
             value={formData.currentWeight}
             onChange={handleChange}
+            onKeyDown={handleKeyDown}
           />
           {errors.currentWeight && (
             <span className={css.errorMessage}>{errors.currentWeight}</span>
@@ -177,11 +256,15 @@ const DailyCaloriesForm = ({ onFormSubmit, isLoading }) => {
             className={`${css.inputField} ${
               errors.desiredWeight ? css.inputError : ""
             }`}
-            type="number"
+            type="text"
             name="desiredWeight"
             placeholder="Desired Weight *"
+            inputMode="numeric"
+            pattern="[1-9][0-9]*"
+            maxLength={FIELD_RULES.desiredWeight.maxLength}
             value={formData.desiredWeight}
             onChange={handleChange}
+            onKeyDown={handleKeyDown}
           />
           {errors.desiredWeight && (
             <span className={css.errorMessage}>{errors.desiredWeight}</span>
