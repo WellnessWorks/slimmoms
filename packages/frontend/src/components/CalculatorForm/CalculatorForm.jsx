@@ -169,11 +169,11 @@ const CalculatorForm = ({ onSubmit }) => {
               <option value="" disabled>
                 Select activity level
               </option>
-              <option value="1.2">1.2 - Sedentary</option>
-              <option value="1.375">1.375 - Lightly active</option>
-              <option value="1.55">1.55 - Moderately active</option>
-              <option value="1.725">1.725 - Very active</option>
-              <option value="1.9">1.9 - Extra active</option>
+              <option value="1.2">Minimum (Sedentary)</option>
+              <option value="1.375">Low (Light exercise 1-3 times/week)</option>
+              <option value="1.55">Medium (Moderate exercise 3-5 times/week)</option>
+              <option value="1.725">High (Hard exercise 6-7 times/week)</option>
+              <option value="1.9">Maximum (Daily intense exercise or job)</option>
             </select>
           </label>
           {errors.activityLevel && (
