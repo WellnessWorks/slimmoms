@@ -35,7 +35,7 @@ app.use(
       if (!origin) return callback(null, true);
 
       // İzin verilen production frontend domain
-      const whitelist = ["https://slimmoms-frontend.vercel.app", "http://localhost:5173"];
+      const whitelist = ["https://slimmoms-frontend.vercel.app", "http://localhost:5174"];
 
       if (whitelist.includes(origin)) {
         return callback(null, true); // İzin ver

@@ -5,12 +5,15 @@ import {
   selectIsRefreshing,
 } from "../redux/auth/authSelectors";
 
+import Loader from "../components/Loader/Loader"; // 🔥 LOADER IMPORT
+
 export default function PrivateRoute({ children }) {
   const isLoggedIn = useSelector(selectIsLoggedIn);
   const isRefreshing = useSelector(selectIsRefreshing);
 
+  // 🔥 Refresh sırasında tam ekran loader göster
   if (isRefreshing) {
-    return <div>Loading...</div>;
+    return <Loader full size={60} />;
   }
 
   return isLoggedIn ? children : <Navigate to="/" replace />;

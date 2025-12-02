@@ -1,3 +1,4 @@
+// src/components/CalculatorForm/CalculatorForm.jsx
 import React, { useState } from "react";
 import styles from "./CalculatorForm.module.css";
 
@@ -54,44 +55,60 @@ const CalculatorForm = ({ onSubmit }) => {
       age: Number(values.age),
       currentWeight: Number(values.currentWeight),
       desiredWeight: Number(values.desiredWeight),
-      bloodType: Number(values.bloodType),
+      bloodType: Number(values.bloodType), // 1,2,3,4
       activityLevel: Number(values.activityLevel),
     });
   };
+
+  // Ekranda gözüken etiketler ↔ backend value mapping’i
+  const bloodOptions = [
+    { value: "1", label: "0" },
+    { value: "2", label: "AB" },
+    { value: "3", label: "A" },
+    { value: "4", label: "B" },
+  ];
 
   return (
     <form className={styles.form} onSubmit={handleSubmit}>
       {/* Height + Desired weight */}
       <div className={styles.row}>
         <div className={styles.field}>
-          <label className={styles.label}>
+          <label htmlFor="height" className={styles.label}>
             Height *
-            <input
-              type="number"
-              name="height"
-              value={values.height}
-              onChange={handleChange}
-              className={styles.input}
-              placeholder="Enter your height (cm)"
-            />
           </label>
-          {errors.height && <span className={styles.error}>{errors.height}</span>}
+          <input
+            id="height"
+            type="number"
+            name="height"
+            value={values.height}
+            onChange={handleChange}
+            className={styles.input}
+          />
+          {errors.height && (
+            <div className={styles.warning}>
+              <span className={styles.warningIcon}>⚠</span>
+              <span>{errors.height}</span>
+            </div>
+          )}
         </div>
 
         <div className={styles.field}>
-          <label className={styles.label}>
+          <label htmlFor="desiredWeight" className={styles.label}>
             Desired weight *
-            <input
-              type="number"
-              name="desiredWeight"
-              value={values.desiredWeight}
-              onChange={handleChange}
-              className={styles.input}
-              placeholder="Target weight (kg)"
-            />
           </label>
+          <input
+            id="desiredWeight"
+            type="number"
+            name="desiredWeight"
+            value={values.desiredWeight}
+            onChange={handleChange}
+            className={styles.input}
+          />
           {errors.desiredWeight && (
-            <span className={styles.error}>{errors.desiredWeight}</span>
+            <div className={styles.warning}>
+              <span className={styles.warningIcon}>⚠</span>
+              <span>{errors.desiredWeight}</span>
+            </div>
           )}
         </div>
       </div>
@@ -99,85 +116,91 @@ const CalculatorForm = ({ onSubmit }) => {
       {/* Age + Blood type */}
       <div className={styles.row}>
         <div className={styles.field}>
-          <label className={styles.label}>
+          <label htmlFor="age" className={styles.label}>
             Age *
-            <input
-              type="number"
-              name="age"
-              value={values.age}
-              onChange={handleChange}
-              className={styles.input}
-              placeholder="How old are you?"
-            />
           </label>
-          {errors.age && <span className={styles.error}>{errors.age}</span>}
+          <input
+            id="age"
+            type="number"
+            name="age"
+            value={values.age}
+            onChange={handleChange}
+            className={styles.input}
+          />
+          {errors.age && (
+            <div className={styles.warning}>
+              <span className={styles.warningIcon}>⚠</span>
+              <span>{errors.age}</span>
+            </div>
+          )}
         </div>
 
         <div className={styles.field}>
           <span className={styles.label}>Blood type *</span>
           <div className={styles.radioGroup}>
-            {[1, 2, 3, 4].map((num) => (
-              <label key={num} className={styles.radioLabel}>
+            {bloodOptions.map((opt) => (
+              <label key={opt.value} className={styles.radioLabel}>
                 <input
                   type="radio"
                   name="bloodType"
-                  value={num}
-                  checked={values.bloodType === String(num)}
+                  value={opt.value}
+                  checked={values.bloodType === opt.value}
                   onChange={handleChange}
                 />
-                <span>{num}</span>
+                <span>{opt.label}</span>
               </label>
             ))}
           </div>
           {errors.bloodType && (
-            <span className={styles.error}>{errors.bloodType}</span>
+            <div className={styles.warning}>
+              <span className={styles.warningIcon}>⚠</span>
+              <span>{errors.bloodType}</span>
+            </div>
           )}
         </div>
       </div>
 
-      {/* Current weight */}
+      {/* Current weight + Activity level yan yana (tablet & desktop) */}
       <div className={styles.row}>
-        <div className={`${styles.field} ${styles.fullWidth}`}>
-          <label className={styles.label}>
-            Current weight *
-            <input
-              type="number"
-              name="currentWeight"
-              value={values.currentWeight}
-              onChange={handleChange}
-              className={styles.input}
-              placeholder="Your current weight (kg)"
-            />
-          </label>
+        <div className={styles.field}>
+          <label className={styles.label}>Current weight *</label>
+          <input
+            type="number"
+            name="currentWeight"
+            value={values.currentWeight}
+            onChange={handleChange}
+            className={styles.input}
+          />
           {errors.currentWeight && (
-            <span className={styles.error}>{errors.currentWeight}</span>
+            <div className={styles.warning}>
+              <span className={styles.warningIcon}>⚠</span>
+              <span>{errors.currentWeight}</span>
+            </div>
           )}
         </div>
-      </div>
 
-      {/* Activity level */}
-      <div className={styles.row}>
-        <div className={`${styles.field} ${styles.fullWidth}`}>
-          <label className={styles.label}>
-            Activity level *
-            <select
-              name="activityLevel"
-              value={values.activityLevel}
-              onChange={handleChange}
-              className={styles.input}
-            >
-              <option value="" disabled>
-                Select activity level
-              </option>
-              <option value="1.2">Minimum (Sedentary)</option>
-              <option value="1.375">Low (Light exercise 1-3 times/week)</option>
-              <option value="1.55">Medium (Moderate exercise 3-5 times/week)</option>
-              <option value="1.725">High (Hard exercise 6-7 times/week)</option>
-              <option value="1.9">Maximum (Daily intense exercise or job)</option>
-            </select>
-          </label>
+        <div className={styles.field}>
+          <label className={styles.label}>Activity level *</label>
+          <select
+            name="activityLevel"
+            value={values.activityLevel}
+            onChange={handleChange}
+            className={styles.input}
+          >
+            <option value="" disabled>
+              Select activity level
+            </option>
+            <option value="1.2">Minimum</option>
+            <option value="1.375">Low</option>
+            <option value="1.55">Medium</option>
+            <option value="1.725">High</option>
+            <option value="1.9">Maximum</option>
+          </select>
           {errors.activityLevel && (
-            <span className={styles.error}>{errors.activityLevel}</span>
+            <div className={styles.warning}>
+              <span className={styles.warningIcon}>⚠</span>
+              <span>{errors.activityLevel}</span>
+            </div>
           )}
         </div>
       </div>

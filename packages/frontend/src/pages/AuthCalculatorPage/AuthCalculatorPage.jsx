@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { Navigate } from "react-router-dom";
 import CalculatorForm from "../../components/CalculatorForm/CalculatorForm";
 import SummaryCard from "../../components/SummaryCards/SummaryCard";
-import Loader from "../../components/Loader/Loader"; // 🔥 Universal Loader
+import Loader from "../../components/Loader/Loader";
 import { userTransactionApi } from "../../api/userTransactionApi";
 import styles from "./AuthCalculatorPage.module.css";
 
@@ -12,22 +12,17 @@ const AuthCalculatorPage = () => {
   const [forbiddenFoods, setForbiddenFoods] = useState([]);
   const [consumedKcal, setConsumedKcal] = useState(0);
   const [error, setError] = useState(null);
+  const [isPageLoading, setIsPageLoading] = useState(true);
+  const [redirectToLogin, setRedirectToLogin] = useState(false);
 
-  const [isPageLoading, setIsPageLoading] = useState(true); // 🔥 FULL LOADER
+  // 🔥 ARTIK localStorage’dan token ALMIYORUZ
+  // const token = localStorage.getItem("token");
 
-  const token = localStorage.getItem("token");
-
-  // ---------- SAYFA İÇİN GEREKLİ TÜM VERİLER ----------
   useEffect(() => {
-    if (!token) return;
-
     const loadEverything = async () => {
       try {
         // 1) PROFIL
-        const { data } = await userTransactionApi.get("/api/v1/users/me", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
+        const { data } = await userTransactionApi.get("/api/v1/users/me");
         const user = data.user || data;
 
         if (typeof user.dailyCalorieGoal === "number") {
@@ -39,8 +34,7 @@ const AuthCalculatorPage = () => {
         // 2) FORBIDDEN FOODS
         if (user.bloodGroup) {
           const res = await userTransactionApi.get(
-            `/api/v1/products/forbidden?bloodGroup=${user.bloodGroup}`,
-            { headers: { Authorization: `Bearer ${token}` } }
+            `/api/v1/products/forbidden?bloodGroup=${user.bloodGroup}`
           );
 
           if (Array.isArray(res.data.forbiddenFoods)) {
@@ -48,7 +42,7 @@ const AuthCalculatorPage = () => {
           }
         }
 
-        // 3) BUGÜNÜN GÜN ÖZETİ (Diary ile aynı)
+        // 3) BUGÜNÜN ÖZETİ
         const today = new Date();
         const Y = today.getFullYear();
         const M = String(today.getMonth() + 1).padStart(2, "0");
@@ -56,8 +50,7 @@ const AuthCalculatorPage = () => {
         const ISO = `${Y}-${M}-${D}`;
 
         const dayInfo = await userTransactionApi.get(
-          `/api/v1/day/info?date=${ISO}`,
-          { headers: { Authorization: `Bearer ${token}` } }
+          `/api/v1/day/info?date=${ISO}`
         );
 
         if (typeof dayInfo.data.consumedCalories === "number") {
@@ -69,18 +62,24 @@ const AuthCalculatorPage = () => {
         }
       } catch (err) {
         console.error("AUTH PAGE LOAD ERROR:", err);
+        // refresh token + /users/me denemesi sonrası hala 401 ise login’e at
+        if (err.response?.status === 401) {
+          setRedirectToLogin(true);
+        }
       } finally {
-        setIsPageLoading(false); // 🔥 SAYFA HAZIR → loader kapanır
+        setIsPageLoading(false);
       }
     };
 
     loadEverything();
-  }, [token]);
+  }, []);
 
-  // login değilse
-  if (!token) return <Navigate to="/login" replace />;
+  // 🔥 Eğer gerçekten yetkisizse, BURADA login’e at
+  if (redirectToLogin) {
+    return <Navigate to="/login" replace />;
+  }
 
-  // 🔥 TAM EKRAN LOADER
+  // 🔥 İlk açılışta / refresh’te tam ekran loader
   if (isPageLoading) {
     return <Loader full size={60} />;
   }
@@ -91,7 +90,6 @@ const AuthCalculatorPage = () => {
     year: "numeric",
   });
 
-  // ---------- FORM HESABI ----------
   const handleCalculate = async ({
     height,
     age,
@@ -115,8 +113,7 @@ const AuthCalculatorPage = () => {
 
       const { data } = await userTransactionApi.post(
         "/api/v1/calories/private-intake",
-        payload,
-        { headers: { Authorization: `Bearer ${token}` } }
+        payload
       );
 
       if (typeof data.dailyRate === "number") {

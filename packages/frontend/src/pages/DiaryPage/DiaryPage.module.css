@@ -209,8 +209,8 @@
 
 /* Turuncu yuvarlak + (liste ekranında ve tablet/desktop’ta) */
 .addBtnCircle {
-  width: 62px;
-  height: 52px;
+  width: 48px;
+  height: 48px;
   border-radius: 100%;
   border: none;
   background: #fc842d;
@@ -338,6 +338,39 @@
 /* =========================
    TABLET ( >=768px )
    ========================= */
+@media (min-width: 768px) and (max-width: 1279px) {
+
+  .right {
+    position: relative;
+    background-color: #f5f6fb;
+    display: flex;
+    flex: 1;
+    overflow: hidden; 
+    background-image: none !important; 
+  }
+
+  .right::before {
+    content: "";
+    position: absolute;
+
+    
+    right: -40px;     
+    bottom: -180px;  
+
+    width: 370px;
+    height: 550px;
+
+    background-image: url("../../assets/img/leaf-img1x.webp");
+    background-repeat: no-repeat;
+    background-size: contain;
+
+   
+    transform: rotate(90deg);
+
+    pointer-events: none;
+  }
+
+}
 
 @media (min-width: 768px) {
   .page {
@@ -361,24 +394,15 @@
     box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
   }
 
-  /* 🔥 Sağ kolon ve summary'yi full-width yap */
-  .right {
-    display: flex;
-    flex: 1;
-    width: 100%;
-    align-items: stretch;        /* yüksekliği de sağ kolona kadar uzasın */
-    justify-content: flex-start; /* ortalamayı bırak, sola yapıştır */
-  }
-
-  .summaryBox {
+   
+    .summaryBox {
     margin-top: 0;
     margin-left: 0;
     margin-right: 0;
-    padding: 0;
-    width: 100%;                /* sağ kolonun tamamını kapla */
+    padding: 48px 32px;
+    width: 100%;
   }
-
-  /* SummaryCard (card) sağ kolonun tamamını alsın */
+ 
   .summaryBox > * {
     width: 100%;
   }
@@ -405,6 +429,10 @@
     margin: 0 0 8px 8px;
     align-self: flex-end;
   }
+  .addBtnCircle {
+  width: 62px;
+  height: 52px;
+}
 }
 .warning {
   margin-top: 8px;
@@ -412,9 +440,7 @@
   color: #fc842d;
 }
 
-/* =========================
-   DESKTOP ( >=1280px )
-   ========================= */
+
 .tableWrapper::-webkit-scrollbar {
   width: 6px;
 }
@@ -446,19 +472,25 @@
     min-height: 100vh;
     align-items: center;
   }
+.addBtnCircle {
+  width: 62px;
+  height: 52px;
+}
+ .right {
+  background-color: #f5f6fb;
+  background-image: url("../../assets/img/leaf-img2x.webp");
+  background-repeat: no-repeat;
 
-  .right {
-    flex: 1;
-    margin-top: 0;
-    padding-top: 0;
+  background-size: 150% 105vh;
+  background-position: 30% 25%;  
 
-    display: flex;
-    justify-content: flex-start;
-    align-items: flex-start;
-  }
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
 
   .summaryBox {
-    background: #f5f6fb;
+    background: transparent;
     padding: 220px 48px;
     margin-top: 0;
     width: 480px;
@@ -470,9 +502,9 @@
   }
   
     .tableWrapper {
-    height: 420px;              /* 🔥 sabit yükseklik veriyoruz */
+    height: 420px;              
     max-height: none;
-    overflow-y: auto !important; /* başka bir kuralı ezer */
+    overflow-y: auto !important; 
     overflow-x: hidden;
   }
   .dateRow {

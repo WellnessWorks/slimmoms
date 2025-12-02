@@ -108,21 +108,48 @@ export const logOut = createAsyncThunk("auth/logout", async (_, thunkAPI) => {
   }
 });
 
+
 // REFRESH USER
 export const refreshUser = createAsyncThunk(
   "auth/refresh",
   async (_, thunkAPI) => {
-    const savedToken = localStorage.getItem("token");
-    if (!savedToken) {
-      return thunkAPI.rejectWithValue("Token not found");
+    const savedRefreshToken = localStorage.getItem("refreshToken");
+    if (!savedRefreshToken) {
+      return thunkAPI.rejectWithValue("Refresh token not found");
     }
 
-    setToken(savedToken);
-
     try {
-      const { data } = await userTransactionApi.get("/api/v1/auth/refresh");
-      return data;
+      // 1) Refresh token ile yeni access+refresh iste
+      const refreshRes = await userTransactionApi.post("/api/v1/auth/refresh", {
+        refreshToken: savedRefreshToken,
+      });
+
+      const { accessToken, refreshToken } = refreshRes.data;
+
+      // LocalStorage güncelle
+      localStorage.setItem("token", accessToken);
+      localStorage.setItem("refreshToken", refreshToken);
+
+      // Axios'a yeni access token'ı yaz
+      setToken(accessToken);
+
+      // 2) Yeni access token ile profil çek (/users/me)
+      const meRes = await userTransactionApi.get("/api/v1/users/me");
+      const user = meRes.data.user || meRes.data;
+
+      if (user?.email) {
+        localStorage.setItem("email", user.email);
+      }
+
+      // Slice'a hem user hem token'ları gönder
+      return { user, accessToken, refreshToken };
     } catch (error) {
+      // Refresh patlarsa tamamen logout say
+      removeToken();
+      localStorage.removeItem("token");
+      localStorage.removeItem("refreshToken");
+      localStorage.removeItem("email");
+
       return handleAuthError(error, thunkAPI);
     }
   }

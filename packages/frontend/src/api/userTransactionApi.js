@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const BASE_URL =
-  import.meta.env.VITE_BACKEND_URL || "https://slimmoms-j4sf.onrender.com";
+  import.meta.env.VITE_BACKEND_URL || "http://localhost:4000/";
 
 export const userTransactionApi = axios.create({
   baseURL: BASE_URL,
@@ -14,3 +14,7 @@ export const setToken = (token) => {
 export const removeToken = () => {
   userTransactionApi.defaults.headers.common.Authorization = "";
 };
+const savedToken = localStorage.getItem("token");
+if (savedToken) {
+  setToken(savedToken);
+}
