@@ -75,47 +75,49 @@ const RegistrationForm = () => {
   };
 
   return (
-    <div className={css.registerWrapper}>
-      <h2 className="auth-title">REGISTER</h2>
-      <form onSubmit={handleSubmit(onSubmit)} className={css.registerForm}>
-        <FormInput
-          id={nameFieldId}
-          label="Name"
-          type="name"
-          placeholder="Name *"
-          register={register("name")}
-          error={errors.name?.message}
-        />
+    <div className={css.registerContainer}>
+      <div className={css.registerWrapper}>
+        <h2 className="auth-title">REGISTER</h2>
+        <form onSubmit={handleSubmit(onSubmit)} className={css.registerForm}>
+          <FormInput
+            id={nameFieldId}
+            label="Name"
+            type="name"
+            placeholder="Name *"
+            register={register("name")}
+            error={errors.name?.message}
+          />
 
-        <FormInput
-          id={emailFieldId}
-          label="E-mail"
-          type="email"
-          placeholder="Email *"
-          register={register("email")}
-          error={errors.email?.message}
-        />
+          <FormInput
+            id={emailFieldId}
+            label="E-mail"
+            type="email"
+            placeholder="Email *"
+            register={register("email")}
+            error={errors.email?.message}
+          />
 
-        <FormInput
-          id={passwordFieldId}
-          label="Password"
-          type="password"
-          placeholder="Password *"
-          register={register("password")}
-          error={errors.password?.message}
-        />
-        {authError && <p className={css.authErrorMessage}>{authError}</p>}
-        <div className={css.registerButtonWrapper}>
-          <button type="submit" disabled={isLoading} className="btn-primary">
-            {isLoading ? "Loading..." : "Register"}
-          </button>
-          <Link to="/login">
-            <button type="button" className="btn-secondary">
-              Log in
+          <FormInput
+            id={passwordFieldId}
+            label="Password"
+            type="password"
+            placeholder="Password *"
+            register={register("password")}
+            error={errors.password?.message}
+          />
+          {authError && <p className={css.authErrorMessage}>{authError}</p>}
+          <div className={css.registerButtonWrapper}>
+            <button type="submit" disabled={isLoading} className="btn-primary">
+              {isLoading ? "Loading..." : "Register"}
             </button>
-          </Link>
-        </div>
-      </form>
+            <Link to="/login">
+              <button type="button" className="btn-secondary">
+                Log in
+              </button>
+            </Link>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };

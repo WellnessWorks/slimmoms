@@ -24,7 +24,16 @@
   .loginContainer {
     height: 100vh;
     overflow: hidden;
-    /*background gelecek*/
+    background-image: url("../../../assets/img/tablet-auth-background1x.webp");
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: right;
+  }
+
+  @media (min-resolution: 2dppx) {
+    .loginContainer {
+      background-image: url("../../../assets/img/tablet-auth-background2x.webp");
+    }
   }
 
   .loginWrapper {
@@ -41,10 +50,26 @@
   }
 }
 
-@media (min-width: 1280) {
+@media (min-width: 1280px) {
+  .loginContainer {
+    background-image: url("../../../assets/img/desktop-background1x.webp");
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: right;
+  }
+
+  @media (min-resolution: 2dppx) {
+    .loginContainer {
+      background-image: url("../../../assets/img/desktop-background2x.webp");
+    }
+  }
+
   .loginWrapper {
-    width: 1280px;
+    text-align: start;
     margin-top: 240px;
+    width: 1280px;
+    margin-left: auto;
+    margin-right: auto;
     padding: 0 16px;
   }
 }

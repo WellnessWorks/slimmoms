@@ -27,10 +27,12 @@
 }
 
 .userSeparator {
-  color: var(--light-gray);
+  background-color: var(--light-gray);
+
+  width: 2px;
   height: 32px;
-  display: flex;
-  align-items: center;
+
+  display: block;
 }
 
 .exitBtn {

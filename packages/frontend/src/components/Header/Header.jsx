@@ -34,7 +34,7 @@ const Header = () => {
   const userMenu = (
     <div className={css.userInfo}>
       <span className={css.userName}>{userName}</span>
-      <div className={css.userSeparator}>|</div>
+      <div className={css.userSeparator}></div>
       <button type="button" onClick={handleLogout} className={css.exitBtn}>
         Exit
       </button>
