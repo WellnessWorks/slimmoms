@@ -1,0 +1,86 @@
+/* Mobile + default */
+
+.card {
+  width: 100%;
+  background: #f5f6fb;
+  border-radius: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Sol kolon */
+.summaryCol {
+  width: 100%;
+}
+
+.title {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #9b9faa;
+  margin-bottom: 8px;
+}
+
+.item span:last-child {
+  font-weight: 700;
+  color: #212121;
+}
+
+/* Sağ kolon */
+.foodCol {
+  width: 100%;
+}
+
+.foodTitle {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.foodText {
+  font-size: 12px;
+  color: #9b9faa;
+}
+
+/* ---------- TABLET 768–1279px: YAN YANA ---------- */
+@media (min-width: 768px) and (max-width: 1279px) {
+  .card {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 80px;
+    align-items: flex-start;
+    justify-items: center;
+  }
+  
+}
+
+/* ---------- DESKTOP 1280+: ALT ALTA GÖRÜNÜM ---------- */
+@media (min-width: 1280px) {
+  .card {
+    display: flex;
+    flex-direction: column;   /* alt alta */
+    align-items: center;      /* ortala */
+    justify-content: center;  /* ortala */
+    padding: 60px 80px;
+    gap: 40px;
+  }
+
+  .summaryCol,
+  .foodCol {
+    max-width: 450px;         /* ortalanmış kutular */
+    width: 100%;
+  }
+}

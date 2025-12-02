@@ -64,7 +64,7 @@ const LoginForm = () => {
     try {
       await dispatch(logIn(values)).unwrap();
       reset();
-      navigate("/diary"); // Başarılı login sonrası yönlendirme
+      navigate("/calculator"); // Başarılı login sonrası yönlendirme
     } catch {
       // hata redux tarafından yönetiliyor
     }

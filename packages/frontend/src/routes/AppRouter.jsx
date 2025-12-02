@@ -1,16 +1,22 @@
-import React, { useEffect } from "react";
-import { Suspense } from "react";
+// src/components/AppRouter.jsx
+import React, { useEffect, Suspense } from "react";
 import { useDispatch } from "react-redux";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { refreshUser } from "../redux/auth/authOperations";
 
-// Lazy-loaded Sayfalar
+import PrivateRoute from "./PrivateRoute";
+import RestrictedRoute from "./RestrictedRoute";
+
+// Lazy-loaded sayfalar
 const MainPage = React.lazy(() => import("../pages/MainPage/MainPage"));
 const LoginPage = React.lazy(() => import("../pages/LoginPage/LoginPage"));
 const RegistrationPage = React.lazy(() =>
   import("../pages/RegistrationPage/RegistrationPage")
 );
 const Layout = React.lazy(() => import("../pages/Layout/Layout"));
+const AuthCalculatorPage = React.lazy(() =>
+  import("../pages/AuthCalculatorPage/AuthCalculatorPage")
+);
 
 const AppRouter = () => {
   const dispatch = useDispatch();
@@ -24,11 +30,44 @@ const AppRouter = () => {
       <Suspense fallback={<div>Loading...</div>}>
         <Routes>
           <Route path="/" element={<Layout />}>
-          <Route index element={<MainPage />} />
-          {/* Login ve Register */}
-          <Route path="login" element={<LoginPage />} />
+            {/* 🔒 MAIN */}
+            <Route
+              index
+              element={
+                <RestrictedRoute redirectTo="/calculator">
+                  <MainPage />
+                </RestrictedRoute>
+              }
+            />
 
-          <Route path="register" element={<RegistrationPage />} />
+            {/* 🔒 LOGIN & REGISTER*/}
+            <Route
+              path="login"
+              element={
+                <RestrictedRoute redirectTo="/calculator">
+                  <LoginPage />
+                </RestrictedRoute>
+              }
+            />
+
+            <Route
+              path="register"
+              element={
+                <RestrictedRoute redirectTo="/calculator">
+                  <RegistrationPage />
+                </RestrictedRoute>
+              }
+            />
+
+            {/* 🔐 CALCULATOR*/}
+            <Route
+              path="calculator"
+              element={
+                <PrivateRoute>
+                  <AuthCalculatorPage />
+                </PrivateRoute>
+              }
+            />
           </Route>
         </Routes>
       </Suspense>
