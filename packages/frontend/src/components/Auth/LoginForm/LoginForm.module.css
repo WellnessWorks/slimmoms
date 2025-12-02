@@ -1,1 +1,50 @@
-/* style */
+.loginWrapper {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  margin-top: 40px;
+}
+
+.loginForm {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  margin-top: 60px;
+}
+
+.loginButtonWrapper {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+@media (min-width: 768px) {
+  .loginContainer {
+    height: 100vh;
+    overflow: hidden;
+    /*background gelecek*/
+  }
+
+  .loginWrapper {
+    text-align: start;
+    margin-top: 160px;
+    width: 768px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0 32px;
+  }
+
+  .loginButtonWrapper {
+    flex-direction: row;
+  }
+}
+
+@media (min-width: 1280) {
+  .loginWrapper {
+    width: 1280px;
+    margin-top: 240px;
+    padding: 0 16px;
+  }
+}

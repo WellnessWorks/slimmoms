@@ -15,12 +15,16 @@ import {
 } from "../../../redux/auth/authSelectors";
 
 //Validasyon Şeması
+const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
 const registerSchema = yup.object().shape({
   name: yup.string().required("Required"),
   email: yup.string().email("Invalid email address").required("Required"),
   password: yup
     .string()
-    .min(6, "Password must be at least 6 characters")
+    .matches(
+      passwordPattern,
+      "Password must be at least 8 characters, containing uppercase, lowercase, and a digit."
+    )
     .max(20, "Password must be at most 20 characters")
     .required("Password is required"),
 });
@@ -71,7 +75,8 @@ const RegistrationForm = () => {
   };
 
   return (
-    <div>
+    <div className={css.registerWrapper}>
+      <h2 className="auth-title">REGISTER</h2>
       <form onSubmit={handleSubmit(onSubmit)} className={css.registerForm}>
         <FormInput
           id={nameFieldId}
@@ -86,7 +91,7 @@ const RegistrationForm = () => {
           id={emailFieldId}
           label="E-mail"
           type="email"
-          placeholder="E-mail *"
+          placeholder="Email *"
           register={register("email")}
           error={errors.email?.message}
         />
@@ -101,11 +106,11 @@ const RegistrationForm = () => {
         />
         {authError && <p className={css.authErrorMessage}>{authError}</p>}
         <div className={css.registerButtonWrapper}>
-          <button type="submit" disabled={isLoading} className="form-button">
+          <button type="submit" disabled={isLoading} className="btn-primary">
             {isLoading ? "Loading..." : "Register"}
           </button>
           <Link to="/login">
-            <button type="button" className="form-button-register">
+            <button type="button" className="btn-secondary">
               Log in
             </button>
           </Link>
