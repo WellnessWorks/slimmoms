@@ -5,6 +5,24 @@ import Modal from "../../components/Modal/Modal";
 import DailyCalorieIntake from "../../components/DailyCalorieIntake/DailyCalorieIntake";
 import css from "./MainPage.module.css";
 
+// ögeleri rastgele karıştırmak için shuffle fonksiyonu
+const shuffleArray = (array) => {
+  const newArray = [...array];
+  let currentIndex = newArray.length,
+    randomIndex;
+
+  while (currentIndex !== 0) {
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex--;
+
+    [newArray[currentIndex], newArray[randomIndex]] = [
+      newArray[randomIndex],
+      newArray[currentIndex],
+    ];
+  }
+  return newArray;
+};
+
 const mapBloodGroup = (bloodTypeString) => {
   const bloodGroup = Number(bloodTypeString);
   if (bloodGroup >= 1 && bloodGroup <= 4) {
@@ -50,7 +68,7 @@ const MainPage = () => {
       weight: Number(formData.currentWeight),
       targetWeight: Number(formData.desiredWeight),
       bloodGroup: mappedBloodGroup,
-      gender: "male",
+      gender: "female",
       activityLevel: activityLevelMultiplier,
     };
     const API_URL = "https://slimmoms-j4sf.onrender.com/api/v1/calories/intake";
@@ -61,12 +79,22 @@ const MainPage = () => {
 
       console.log("API Yanıtı:", response.data);
 
-      const { dailyRate, forbiddenFoods } = response.data;
+      const { dailyRate, forbiddenFoods: allForbiddenFoodsFromApi } =
+        response.data;
 
-      console.log("dailyRate:", dailyRate, "forbiddenFoods:", forbiddenFoods);
+      const shuffledFoods = shuffleArray(allForbiddenFoodsFromApi);
+
+      const randomFiveForbiddenFoods = shuffledFoods.slice(0, 5);
+
+      console.log(
+        "dailyRate:",
+        dailyRate,
+        "forbiddenFoods (Random 5):",
+        randomFiveForbiddenFoods
+      );
 
       setDailyRate(dailyRate);
-      setForbiddenFoods(forbiddenFoods);
+      setForbiddenFoods(randomFiveForbiddenFoods);
 
       setIsModalOpen(true);
 

@@ -1,6 +1,6 @@
 .mainPageWrapper {
   min-height: 100vh;
-  overflow: hidden;
+  overflow-x: hidden;
 }
 
 .mainContent {
