@@ -1,29 +1,5 @@
-.contentBox {
-  background-color: var(--white);
-  padding: 20px;
-  margin-bottom: 40px;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
 .intakeTitle {
   margin: 40px 20px 42px 20px;
-}
-
-.closeButton {
-  display: block;
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  right: auto;
-  background: none;
-  border: none;
-  font-size: 24px;
-  cursor: pointer;
-  color: #000000;
-  line-height: 1;
 }
 
 .rateBox {
@@ -33,7 +9,6 @@
   border-bottom: 1px solid #e0e0e0;
   width: 100%;
   justify-content: center;
-  margin-bottom: 20px;
 }
 
 .dailyRate {
@@ -51,27 +26,23 @@
 
 .divider {
   border: none;
+  margin: 10px 0 20px 0;
   width: 100%;
-  margin: 0;
 }
 
 .subtitle {
   font-size: 14px;
   font-weight: 700;
   color: var(--dark-gray);
-  margin-top: 0;
-  margin-bottom: 20px;
-  align-self: flex-start;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
 .foodList {
   list-style-type: decimal;
   list-style-position: outside;
   padding-left: 20px;
-  margin-bottom: 0;
-  margin-top: 0;
-  width: 100%;
-  align-self: flex-start;
+  margin-bottom: 40px;
 }
 
 .foodItem {
@@ -81,10 +52,6 @@
   margin-left: 5px;
 }
 
-.foodItem:not(:last-child) {
-  margin-bottom: 10px;
-}
-
 .noFoodItem {
   font-size: 14px;
   color: var(--light-gray);
@@ -92,44 +59,77 @@
   margin-left: 0;
 }
 
-.submitBtn {
-  white-space: nowrap;
-  padding: 13px 25px;
+.intakeButtonFix {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
   width: 210px;
-  height: 43px;
-  display: block;
-  margin: 20px auto 0;
   padding: 10px 20px;
-  background-color: var(--accent, #fc842d);
-  color: #fff;
-  border: none;
-  border-radius: 30px;
-  cursor: pointer;
-  font-weight: 700;
+  height: auto;
+  min-height: 43px;
 }
 
 @media (min-width: 768px) {
-  .modalContent {
+  .intakeBody {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
     width: 450px;
     max-width: none;
-    padding: 50px 30px 30px 30px;
     margin: auto;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   }
-
-  .closeButton {
-    display: block;
-    position: absolute;
-    right: 30px;
-    top: 30px;
-    left: auto;
+  .intakeTitle {
+    margin: 24px 20px 20px 20px;
   }
-
+.divider {
+    margin-bottom: 0px;
+}
   .subtitle {
-    align-self: flex-start;
+    align-self: center;
   }
 
   .foodList {
-    align-self: flex-start;
+    list-style-position: outside;
+    padding-left: 32px;
+    text-align: left;
+    margin: 0 auto 40px;
+    width: fit-content;
+  }
+
+  .intakeButtonFix {
+    margin: 0 auto 80px;
+  }
+}
+@media (min-width: 1280px) {
+  .intakeBody {
+    width: 550px;
+    padding: 0;
+  }
+  .intakeTitle {
+    margin-top: 64px;
+  }
+  .subtitle {
+    align-self: center;
+    margin-bottom: 20px;
+  }
+
+  .foodList {
+    list-style-position: outside;
+    padding-left: 32px;
+    text-align: left;
+    margin: 0 auto 40px;
+    width: fit-content;
+  }
+
+  .intakeButtonFix {
+    margin: 0 auto 82px;
+  }
+  .divider {
+    margin-bottom: 12px;
+  }
+  .foodItem {
+    line-height: 2;
   }
 }

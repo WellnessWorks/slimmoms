@@ -90,10 +90,10 @@ mongoose
     console.log("✅ MongoDB Connection Successful!");
     const port = PORT || 4000;
     app.listen(port, () => {
-      console.log(`🚀 Backend Server running at http://localhost:${port}`);
+    console.log(`🚀 Backend Server running at http://localhost:${port}`);
     });
   })
   .catch((error) => {
     console.error("❌ MongoDB Connection Error:", error.message);
     process.exit(1);
-  });
+});

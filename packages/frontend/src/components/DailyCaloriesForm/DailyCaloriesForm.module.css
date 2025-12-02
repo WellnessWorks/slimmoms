@@ -3,6 +3,7 @@
   margin-top: 32px;
   padding-left: 20px;
   padding-right: 20px;
+  overflow-x: hidden;
 }
 
 .inputGroup {
@@ -11,18 +12,26 @@
   margin-bottom: 32px;
 }
 
+.inputLabel {
+  display: block;
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 8px;
+  color: #9b9faa;
+}
+
 .inputField {
-  width: 240px;
   height: 24px;
   box-sizing: border-box;
   border: none;
   border-bottom: 1px solid #e0e0e0;
   background: transparent;
-  padding: 0;
-  font-size: 14px;
   line-height: 24px;
   outline: none;
   display: block;
+  padding: 0;
+  font-size: 14px;
+  font-weight: bold;
 }
 
 .inputError {
@@ -32,7 +41,7 @@
 .errorMessage {
   color: #fc842d;
   font-size: 12px;
-  margin-top: 4px;
+  margin-top: 10px;
 }
 
 .form {
@@ -41,7 +50,6 @@
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  align-items: center;
 }
 
 .radioGroup {
@@ -57,6 +65,7 @@
 .radioLabel {
   cursor: pointer;
   font-size: 14px;
+  font-weight: bold;
   color: #9b9faa;
   margin-bottom: 8px;
   width: 100%;
@@ -67,15 +76,15 @@
 }
 
 .activityGroup .radioOption {
-    display: flex; 
-    align-items: flex-start; 
-    gap: 10px;
-    margin-top: 10px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 10px;
 }
 
 .activityGroup .customRadio {
-    flex-shrink: 0; 
-    margin-top: 5px; 
+  flex-shrink: 0;
+  margin-top: 5px;
 }
 
 .radioOption {
@@ -119,22 +128,27 @@ input[type="radio"] {
   -webkit-appearance: none;
   -moz-appearance: none;
 }
-
-/* Buton Stili */
+.buttonWrapper {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-top: 40px;
+}
 .submitBtn {
   white-space: nowrap;
   padding: 13px 25px;
   width: 210px;
   height: 43px;
   display: block;
-  margin: 50px auto 100px;
+  margin-bottom: 100px;
   background-color: var(--accent, #fc842d);
   color: #fff;
   border: none;
   border-radius: 30px;
   cursor: pointer;
-  font-weight: 700;
+  font-weight: bold;
 }
+
 @media (min-width: 768px) {
   .formContainer {
     max-width: 704px;
@@ -146,7 +160,7 @@ input[type="radio"] {
   .form {
     margin-top: 68px;
     display: grid;
-    grid-template-columns: 240px 240px;
+    grid-template-columns: 1fr 1fr;
     gap: 40px 32px;
     width: 512px;
     height: auto;
@@ -158,22 +172,24 @@ input[type="radio"] {
     margin-bottom: 20px;
   }
 
-  .inputField {
-    width: 240px;
-    padding: 0 0 10px 0;
-    font-weight: bold;
+  .activityGroup .radioOptions {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 20px 32px;
   }
 
-  /* Kan Grubu (Radio Group) */
   .radioGroup {
     grid-column: 1 / span 2;
     width: 100%;
-    flex-direction: row;
-    align-items: center;
-    gap: 30px;
+    gap: 10px;
     font-weight: bold;
+    margin-bottom: 20px;
   }
 
+  .radioLabel {
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 20px;
+  }
   .radioOptions {
     display: flex;
     gap: 28px;
@@ -185,10 +201,30 @@ input[type="radio"] {
     justify-content: flex-start;
     align-self: flex-start;
     margin-top: 60px;
-    width: 210px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .formContainer {
+    max-width: 608px;
+    margin-top: 144px;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .form {
+    gap: 60px 32px;
+  }
+
+  .buttonWrapper {
+    grid-column: 1 / span 2;
+    display: flex;
+    justify-content: flex-end;
+    align-self: flex-start;
+    margin-top: 28px;
   }
 
   .submitBtn {
-    margin: 0;
+    margin-bottom: 111px;
   }
 }
