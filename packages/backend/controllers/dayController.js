@@ -1,3 +1,4 @@
+// controllers/dayController.js
 import asyncHandler from "express-async-handler";
 import Day from "../models/Day.js";
 import Product from "../models/Product.js";
@@ -6,8 +7,7 @@ import User from "../models/User.js";
 // --- 8. Madde: Ürün Ekleme Endpoint'i ---
 // POST /api/v1/day/add-product
 const addProductToDay = asyncHandler(async (req, res) => {
-  // 1. Gerekli verileri al
-  const userId = req.user._id; // Yetkilendirme katmanından (protect) gelir
+  const userId = req.user._id; // protect middleware'den gelir
   const { date, productId, weight } = req.body;
 
   if (!date || !productId || !weight || weight <= 0) {
@@ -18,23 +18,34 @@ const addProductToDay = asyncHandler(async (req, res) => {
   // Tarihi sadece gün, ay, yıl olacak şekilde standartlaştır
   const standardDate = new Date(new Date(date).setHours(0, 0, 0, 0));
 
-  // 2. Product'ı bul ve kalori bilgisini al
+  // 2. Product'ı bul
   const product = await Product.findById(productId);
-
   if (!product) {
     res.status(404);
     throw new Error("Product not found.");
   }
 
-  // 3. Tüketilen kalori miktarını hesapla
-  // product.calories 100g için olan kalori miktarıdır.
+  // 🔥 Kullanıcının kan grubuna göre bu ürün YASAK mı?
+  const user = await User.findById(userId).select("bloodGroup");
+  const bloodGroupIndex = Number(user?.bloodGroup);
+
+  if (
+    bloodGroupIndex >= 1 &&
+    bloodGroupIndex <= 4 &&
+    Array.isArray(product.groupBloodNotAllowed) &&
+    product.groupBloodNotAllowed[bloodGroupIndex] === true
+  ) {
+    res.status(400);
+    throw new Error("This product is not allowed for your blood group.");
+  }
+
+  // 3. Tüketilen kalori miktarını hesapla (product.calories 100 g içindir)
   const consumedCalories = (product.calories / 100) * weight;
 
   // 4. Günlük kaydı bul veya oluştur
   let dayEntry = await Day.findOne({ userId, date: standardDate });
 
   if (!dayEntry) {
-    // Kayıt yoksa yeni bir günlük kayıt oluştur
     dayEntry = await Day.create({
       userId,
       date: standardDate,
@@ -67,7 +78,6 @@ const addProductToDay = asyncHandler(async (req, res) => {
 // DELETE /api/v1/day/delete-product
 const deleteProductFromDay = asyncHandler(async (req, res) => {
   const userId = req.user._id;
-  // Silme işlemi için benzersiz ürün ID'sine (consumedProducts altındaki) ihtiyacımız var.
   const { consumedProductId } = req.body;
 
   if (!consumedProductId) {
@@ -76,7 +86,6 @@ const deleteProductFromDay = asyncHandler(async (req, res) => {
   }
 
   // 1. Günlük kaydı bul
-  // $in operatörü ile arama yaparak alt dizideki elemanı içeren kaydı buluruz.
   let dayEntry = await Day.findOne({
     userId,
     "consumedProducts._id": consumedProductId,
@@ -97,13 +106,12 @@ const deleteProductFromDay = asyncHandler(async (req, res) => {
 
   const caloriesToRemove = productToDelete.calories;
 
-  // 3. Ürünü alt diziden sil (Mongoose'un .remove() metodu)
-  productToDelete.deleteOne(); // Mongoose 6+ için bu daha doğru bir yöntemdir.
+  // 3. Ürünü alt diziden sil
+  productToDelete.deleteOne();
 
   // 4. Toplam kaloriyi güncelle
   dayEntry.totalCalories -= caloriesToRemove;
 
-  // 5. Kaydet
   await dayEntry.save();
 
   res.status(200).json({
@@ -118,13 +126,13 @@ const deleteProductFromDay = asyncHandler(async (req, res) => {
 const getDayInfo = asyncHandler(async (req, res) => {
   const userId = req.user._id;
 
-  // 1. URL'den 'date' query parametresini al. Yoksa bugünü kullan.
+  // 1. 'date' query parametresi, yoksa bugün
   const dateQuery = req.query.date ? new Date(req.query.date) : new Date();
 
-  // Tarihi sadece gün, ay, yıl olacak şekilde standartlaştır
+  // Tarihi normalize et
   const standardDate = new Date(dateQuery.setHours(0, 0, 0, 0));
 
-  // 2. Kullanıcının günlük kalori hedefini (dailyCalorieGoal) al
+  // 2. Kullanıcının günlük kalori hedefi
   const user = await User.findById(userId).select("dailyCalorieGoal");
 
   if (!user || !user.dailyCalorieGoal) {
@@ -136,10 +144,10 @@ const getDayInfo = asyncHandler(async (req, res) => {
 
   const dailyGoal = user.dailyCalorieGoal;
 
-  // 3. Günlük kaydı (Day Entry) bul
+  // 3. Günlük kaydı bul
   const dayEntry = await Day.findOne({ userId, date: standardDate }).populate({
-    path: "consumedProducts.productId", // Ürün detaylarını çekmek için
-    select: "name calories categories",
+    path: "consumedProducts.productId",
+    select: "title calories categories",
   });
 
   let consumedCalories = 0;
@@ -148,22 +156,18 @@ const getDayInfo = asyncHandler(async (req, res) => {
   if (dayEntry) {
     consumedCalories = dayEntry.totalCalories;
     productsList = dayEntry.consumedProducts.map((product) => ({
-      id: product._id, // consumed product ID
+      id: product._id,
       title: product.title,
       weight: product.weight,
       calories: product.calories,
-      // Orijinal ürün detayları gerekirse:
-      // originalProductId: product.productId._id
     }));
   }
 
-  // 4. Kalan kaloriyi hesapla
   const remainingCalories = Math.max(0, dailyGoal - consumedCalories);
 
-  // 5. Yanıtı gönder
   res.status(200).json({
     status: "success",
-    date: standardDate.toISOString().split("T")[0], // Sadece YYYY-MM-DD formatında gönder
+    date: standardDate.toISOString().split("T")[0],
     dailyGoal,
     consumedCalories,
     remainingCalories,

@@ -17,6 +17,9 @@ const Layout = React.lazy(() => import("../pages/Layout/Layout"));
 const AuthCalculatorPage = React.lazy(() =>
   import("../pages/AuthCalculatorPage/AuthCalculatorPage")
 );
+const DiaryPage = React.lazy(() =>
+  import("../pages/DiaryPage/DiaryPage")
+);
 
 const AppRouter = () => {
   const dispatch = useDispatch();
@@ -29,6 +32,7 @@ const AppRouter = () => {
     <BrowserRouter>
       <Suspense fallback={<div>Loading...</div>}>
         <Routes>
+          {/* Tüm sayfalar Layout altında */}
           <Route path="/" element={<Layout />}>
             {/* 🔒 MAIN */}
             <Route
@@ -40,7 +44,7 @@ const AppRouter = () => {
               }
             />
 
-            {/* 🔒 LOGIN & REGISTER*/}
+            {/* 🔒 LOGIN & REGISTER */}
             <Route
               path="login"
               element={
@@ -49,7 +53,6 @@ const AppRouter = () => {
                 </RestrictedRoute>
               }
             />
-
             <Route
               path="register"
               element={
@@ -59,12 +62,22 @@ const AppRouter = () => {
               }
             />
 
-            {/* 🔐 CALCULATOR*/}
+            {/* 🔐 CALCULATOR */}
             <Route
               path="calculator"
               element={
                 <PrivateRoute>
                   <AuthCalculatorPage />
+                </PrivateRoute>
+              }
+            />
+
+            {/* 🔐 DIARY */}
+            <Route
+              path="diary"
+              element={
+                <PrivateRoute>
+                  <DiaryPage />
                 </PrivateRoute>
               }
             />

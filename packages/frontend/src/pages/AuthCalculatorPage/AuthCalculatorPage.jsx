@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+// src/pages/AuthCalculatorPage/AuthCalculatorPage.jsx
+import React, { useState, useEffect, useMemo } from "react";
 import { Navigate } from "react-router-dom";
 import CalculatorForm from "../../components/CalculatorForm/CalculatorForm";
 import SummaryCard from "../../components/SummaryCards/SummaryCard";
@@ -7,30 +8,53 @@ import styles from "./AuthCalculatorPage.module.css";
 
 const AuthCalculatorPage = () => {
   const [dailyRate, setDailyRate] = useState(null);
+  const [forbiddenFoods, setForbiddenFoods] = useState([]);
   const [error, setError] = useState(null);
+
   const token = localStorage.getItem("token");
 
-  // SAYFA AÇILINCA kullanıcı verisini çek
+  // ---------- 1) PROFİL + FORBIDDEN (sayfaya girince) ----------
   useEffect(() => {
-    if (!token) return; // sadece yönlendirme için
+    if (!token) return;
 
-    const fetchCalorieProfile = async () => {
+    const fetchInitialData = async () => {
       try {
+        // Kullanıcı profilini çek
         const { data } = await userTransactionApi.get("/api/v1/users/me", {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        if (typeof data.dailyRate === "number") {
-          setDailyRate(data.dailyRate);
+        const user = data.user || data;
+
+        // dailyCalorieGoal / dailyRate
+        if (typeof user.dailyCalorieGoal === "number") {
+          setDailyRate(user.dailyCalorieGoal);
+        } else if (typeof user.dailyRate === "number") {
+          setDailyRate(user.dailyRate);
+        }
+
+        // kan grubu → yasak yiyecekler
+        if (user.bloodGroup) {
+          const res = await userTransactionApi.get(
+            `/api/v1/products/forbidden?bloodGroup=${user.bloodGroup}`,
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
+
+          if (Array.isArray(res.data.forbiddenFoods)) {
+            setForbiddenFoods(res.data.forbiddenFoods);
+          }
         }
       } catch (err) {
-        console.error("CALORIE PROFILE ERROR:", err);
+        console.error("INIT LOAD ERROR (/users/me or /products/forbidden):", err);
       }
     };
 
-    fetchCalorieProfile();
+    fetchInitialData();
   }, [token]);
 
+  // ---------- 2) FORM SUBMIT → private-intake ----------
   const handleCalculate = async ({
     height,
     age,
@@ -40,7 +64,6 @@ const AuthCalculatorPage = () => {
     activityLevel,
   }) => {
     setError(null);
-    setDailyRate(null);
 
     try {
       const payload = {
@@ -61,6 +84,7 @@ const AuthCalculatorPage = () => {
         }
       );
 
+      // daily rate
       if (typeof data.dailyRate === "number") {
         setDailyRate(data.dailyRate);
       } else if (typeof data.dailyCalorieGoal === "number") {
@@ -68,7 +92,13 @@ const AuthCalculatorPage = () => {
       } else {
         setError("Server did not return a valid daily calorie value.");
       }
+
+      // yasak yiyecekler
+      if (Array.isArray(data.forbiddenFoods)) {
+        setForbiddenFoods(data.forbiddenFoods);
+      }
     } catch (err) {
+      console.error("PRIVATE-INTAKE ERROR:", err);
       setError(
         err.response?.data?.message ||
           "Something went wrong while calculating calories."
@@ -76,7 +106,16 @@ const AuthCalculatorPage = () => {
     }
   };
 
-  // ❗ TOKEN YOKSA burada yönlendirme
+  // ---------- 3) SUMMARYCARD İÇİN GÖRSEL DEĞERLER ----------
+  // Bu sayfada henüz hiçbir şey yenmediği için:
+  const consumed = 0;
+
+  const percentOfNormal = useMemo(() => {
+    if (!dailyRate || dailyRate <= 0) return 0;
+    return Math.round((consumed / dailyRate) * 100);
+  }, [dailyRate, consumed]);
+
+  // login değilse
   if (!token) return <Navigate to="/login" replace />;
 
   const today = new Date().toLocaleDateString("tr-TR", {
@@ -98,7 +137,15 @@ const AuthCalculatorPage = () => {
         </div>
 
         <div className={styles.right}>
-          <SummaryCard date={today} dailyRate={dailyRate} consumed={0} />
+          <div className={styles.summaryBox}>
+            <SummaryCard
+              date={today}
+              dailyRate={dailyRate}
+              consumed={consumed}
+              forbiddenFoods={forbiddenFoods}
+              percentOfNormal={percentOfNormal}
+            />
+          </div>
         </div>
       </div>
     </section>
