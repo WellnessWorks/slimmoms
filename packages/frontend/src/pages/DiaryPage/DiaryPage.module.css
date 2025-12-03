@@ -439,7 +439,11 @@
   font-size: 12px;
   color: #fc842d;
 }
-
+.warning {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #fc842d;
+}
 
 .tableWrapper::-webkit-scrollbar {
   width: 6px;

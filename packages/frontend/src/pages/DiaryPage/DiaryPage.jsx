@@ -450,9 +450,7 @@ const DiaryPage = () => {
             {isLoadingDay ? (
               <p>Loading day...</p>
             ) : eatenProducts.length === 0 ? (
-              <p className={styles.emptyText}>
-                You have not added any products yet.
-              </p>
+              <p className={styles.emptyText}>You have not added any products yet.</p>
             ) : (
               <table className={styles.table}>
                 <thead>

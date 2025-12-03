@@ -21,10 +21,8 @@ const AuthCalculatorPage = () => {
   useEffect(() => {
     const loadEverything = async () => {
       try {
-        const { data } = await userTransactionApi.get("/api/v1/calories/me", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
+        // 1) PROFIL
+        const { data } = await userTransactionApi.get("/api/v1/users/me");
         const user = data.user || data;
 
         if (typeof user.dailyCalorieGoal === "number") {
