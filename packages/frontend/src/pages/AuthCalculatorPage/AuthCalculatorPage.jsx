@@ -19,8 +19,7 @@ const AuthCalculatorPage = () => {
 
     const fetchInitialData = async () => {
       try {
-        // Kullanıcı profilini çek
-        const { data } = await userTransactionApi.get("/api/v1/users/me", {
+        const { data } = await userTransactionApi.get("/api/v1/calories/me", {
           headers: { Authorization: `Bearer ${token}` },
         });
 
