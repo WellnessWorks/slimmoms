@@ -1,15 +1,14 @@
-import asyncHandler from "express-async-handler"; // Express-Async-Handler eklendi
+// controllers/productController.js
+import asyncHandler from "express-async-handler";
 import Product from "../models/Product.js";
-// User modeline bu endpoint'te ihtiyaç yok (kan grubu query'den geliyor)
+import { getForbiddenProducts as getForbiddenProductsService } from "../services/calorieService.js"; 
+// ↑ senin calorieService.js içindeki getForbiddenProducts
 
 /**
- * Madde #7: Query-string kullanarak ürün arama endpoint'i.
- * Yasaklı ürünleri, kullanıcının kan grubu (eğer varsa) ve arama metnine göre filtreler.
- * GET /api/v1/products/search?query=milk&bloodGroup=2
+ * Ürün adına göre arama
+ * GET /products/search?query=elma&bloodGroup=2
  */
 const searchProducts = asyncHandler(async (req, res) => {
-  // asyncHandler kullanıldı
-
   const { query, bloodGroup } = req.query;
 
   if (!query || query.trim() === "") {
@@ -19,30 +18,21 @@ const searchProducts = asyncHandler(async (req, res) => {
     );
   }
 
-  // 1. Kan Grubu Doğrulaması
-  // Joi/Validation Middleware'i burada bu kontrolü yapmalıydı,
-  // ancak endpoint içinde tekrar kontrol edelim.
-  const bloodGroupIndex = parseInt(bloodGroup);
+  const bloodGroupIndex = parseInt(bloodGroup, 10);
 
-  // Temel filtre objesini oluştur
   let filter = {};
 
-  // 2. Arama Tipi: Text Index Kullanımı
-  // Mongoose Text Index'i kullanmak için $regex yerine $text kullanılır
-  // Bu, performansı ciddi ölçüde artırır.
+  // Text index ile arama
   filter.$text = { $search: query };
 
-  // 3. Kan Grubu Filtresi
+  // Kan grubuna göre YASAK OLMAYAN ürünler
   if (bloodGroupIndex >= 1 && bloodGroupIndex <= 4) {
-    // Sadece yasaklı OLMADIĞI ürünleri istiyoruz.
-    // groupBloodNotAllowed[1] -> groupBloodNotAllowed.1
     filter[`groupBloodNotAllowed.${bloodGroupIndex}`] = false;
   }
 
-  // 4. Sorguyu Çalıştır
   const products = await Product.find(filter)
-    .limit(20) // Performans için sonuçları sınırla
-    .select("title calories categories weight groupBloodNotAllowed"); // Sadece gerekli alanları seç
+    .limit(20)
+    .select("title calories categories weight groupBloodNotAllowed");
 
   res.status(200).json({
     status: "success",
@@ -51,4 +41,30 @@ const searchProducts = asyncHandler(async (req, res) => {
   });
 });
 
-export { searchProducts };
+/**
+ * Kan grubuna göre YASAK ürünleri getir
+ * GET /products/forbidden?bloodGroup=2
+ */
+const getForbiddenProducts = asyncHandler(async (req, res) => {
+  const { bloodGroup } = req.query;
+  const bloodGroupIndex = parseInt(bloodGroup, 10);
+
+  if (!bloodGroupIndex || bloodGroupIndex < 1 || bloodGroupIndex > 4) {
+    res.status(400);
+    throw new Error(
+      'Geçerli bir "bloodGroup" parametresi göndermelisiniz (1, 2, 3 veya 4).'
+    );
+  }
+
+  // calorieService içindeki fonksiyonu kullanıyoruz
+  const forbiddenFoods = await getForbiddenProductsService(bloodGroupIndex);
+
+  res.status(200).json({
+    status: "success",
+    bloodGroup: bloodGroupIndex,
+    count: forbiddenFoods.length,
+    forbiddenFoods, // ["Ready breakfast ...", "Sütlü çikolata", ...]
+  });
+});
+
+export { searchProducts, getForbiddenProducts };

@@ -3,21 +3,21 @@
 .card {
   width: 100%;
   background: #f5f6fb;
-  border-radius: 0;
+  padding: 50px 16px;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 56px;
 }
 
-/* Sol kolon */
+/* Sol taraf: Summary */
 .summaryCol {
   width: 100%;
 }
 
 .title {
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 700;
-  margin-bottom: 16px;
+  margin-bottom: 20px;      /* ✨ daha fazla boşluk */
 }
 
 .list {
@@ -31,7 +31,8 @@
   justify-content: space-between;
   font-size: 12px;
   color: #9b9faa;
-  margin-bottom: 8px;
+  margin-bottom: 12px;      /* ✨ satırlar arası boşluk artırıldı */
+  line-height: 1.6;         /* ✨ daha ferah */
 }
 
 .item span:last-child {
@@ -39,20 +40,35 @@
   color: #212121;
 }
 
-/* Sağ kolon */
+/* Sağ taraf: Food not recommended */
 .foodCol {
   width: 100%;
 }
 
 .foodTitle {
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 700;
-  margin-bottom: 8px;
+  margin-bottom: 14px;       /* ✨ biraz daha boşluk */
 }
 
 .foodText {
   font-size: 12px;
   color: #9b9faa;
+}
+
+.foodList {
+  margin-top: 14px;          /* ✨ başlık ile arayı açtık */
+  padding-left: 0;
+  list-style: none;
+  font-size: 12px;
+  color: #9b9faa;
+
+  margin-left: 4px;
+}
+
+.foodItem {
+  margin-bottom: 10px;       /* ✨ item'lar arası boşluk */
+  line-height: 1.6;          /* ✨ ferahlık */
 }
 
 /* ---------- TABLET 768–1279px: YAN YANA ---------- */
@@ -64,23 +80,22 @@
     align-items: flex-start;
     justify-items: center;
   }
-  
 }
 
 /* ---------- DESKTOP 1280+: ALT ALTA GÖRÜNÜM ---------- */
 @media (min-width: 1280px) {
   .card {
     display: flex;
-    flex-direction: column;   /* alt alta */
-    align-items: center;      /* ortala */
-    justify-content: center;  /* ortala */
-    padding: 60px 80px;
-    gap: 40px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start; /* ortalama kaldırıldı */
+   
+    gap: 50px;                    /* ✨ bloklar arası daha fazla boşluk */
   }
 
   .summaryCol,
   .foodCol {
-    max-width: 450px;         /* ortalanmış kutular */
+    max-width: 450px;
     width: 100%;
   }
 }

@@ -1,36 +1,97 @@
+// src/pages/AuthCalculatorPage/AuthCalculatorPage.jsx
 import React, { useState, useEffect } from "react";
 import { Navigate } from "react-router-dom";
 import CalculatorForm from "../../components/CalculatorForm/CalculatorForm";
 import SummaryCard from "../../components/SummaryCards/SummaryCard";
+import Loader from "../../components/Loader/Loader"; // 🔥 Universal Loader
 import { userTransactionApi } from "../../api/userTransactionApi";
 import styles from "./AuthCalculatorPage.module.css";
 
 const AuthCalculatorPage = () => {
   const [dailyRate, setDailyRate] = useState(null);
+  const [forbiddenFoods, setForbiddenFoods] = useState([]);
+  const [consumedKcal, setConsumedKcal] = useState(0);
   const [error, setError] = useState(null);
+
+  const [isPageLoading, setIsPageLoading] = useState(true); // 🔥 FULL LOADER
+
   const token = localStorage.getItem("token");
 
-  // SAYFA AÇILINCA kullanıcı verisini çek
+  // ---------- SAYFA İÇİN GEREKLİ TÜM VERİLER ----------
   useEffect(() => {
-    if (!token) return; // sadece yönlendirme için
+    if (!token) return;
 
-    const fetchCalorieProfile = async () => {
+    const loadEverything = async () => {
       try {
+        // 1) PROFIL
         const { data } = await userTransactionApi.get("/api/v1/users/me", {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        if (typeof data.dailyRate === "number") {
-          setDailyRate(data.dailyRate);
+        const user = data.user || data;
+
+        if (typeof user.dailyCalorieGoal === "number") {
+          setDailyRate(user.dailyCalorieGoal);
+        } else if (typeof user.dailyRate === "number") {
+          setDailyRate(user.dailyRate);
+        }
+
+        // 2) FORBIDDEN FOODS
+        if (user.bloodGroup) {
+          const res = await userTransactionApi.get(
+            `/api/v1/products/forbidden?bloodGroup=${user.bloodGroup}`,
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+
+          if (Array.isArray(res.data.forbiddenFoods)) {
+            setForbiddenFoods(res.data.forbiddenFoods);
+          }
+        }
+
+        // 3) BUGÜNÜN GÜN ÖZETİ (Diary ile aynı)
+        const today = new Date();
+        const Y = today.getFullYear();
+        const M = String(today.getMonth() + 1).padStart(2, "0");
+        const D = String(today.getDate()).padStart(2, "0");
+        const ISO = `${Y}-${M}-${D}`;
+
+        const dayInfo = await userTransactionApi.get(
+          `/api/v1/day/info?date=${ISO}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+
+        if (typeof dayInfo.data.consumedCalories === "number") {
+          setConsumedKcal(dayInfo.data.consumedCalories);
+        }
+
+        if (typeof dayInfo.data.dailyGoal === "number") {
+          setDailyRate(dayInfo.data.dailyGoal);
         }
       } catch (err) {
-        console.error("CALORIE PROFILE ERROR:", err);
+        console.error("AUTH PAGE LOAD ERROR:", err);
+      } finally {
+        setIsPageLoading(false); // 🔥 SAYFA HAZIR → loader kapanır
       }
     };
 
-    fetchCalorieProfile();
+    loadEverything();
   }, [token]);
 
+  // login değilse
+  if (!token) return <Navigate to="/login" replace />;
+
+  // 🔥 TAM EKRAN LOADER
+  if (isPageLoading) {
+    return <Loader full size={60} />;
+  }
+
+  const todayLabel = new Date().toLocaleDateString("tr-TR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
+
+  // ---------- FORM HESABI ----------
   const handleCalculate = async ({
     height,
     age,
@@ -40,7 +101,6 @@ const AuthCalculatorPage = () => {
     activityLevel,
   }) => {
     setError(null);
-    setDailyRate(null);
 
     try {
       const payload = {
@@ -56,9 +116,7 @@ const AuthCalculatorPage = () => {
       const { data } = await userTransactionApi.post(
         "/api/v1/calories/private-intake",
         payload,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
 
       if (typeof data.dailyRate === "number") {
@@ -68,22 +126,18 @@ const AuthCalculatorPage = () => {
       } else {
         setError("Server did not return a valid daily calorie value.");
       }
+
+      if (Array.isArray(data.forbiddenFoods)) {
+        setForbiddenFoods(data.forbiddenFoods);
+      }
     } catch (err) {
+      console.error("PRIVATE-INTAKE ERROR:", err);
       setError(
         err.response?.data?.message ||
           "Something went wrong while calculating calories."
       );
     }
   };
-
-  // ❗ TOKEN YOKSA burada yönlendirme
-  if (!token) return <Navigate to="/login" replace />;
-
-  const today = new Date().toLocaleDateString("tr-TR", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-  });
 
   return (
     <section className={styles.page}>
@@ -98,7 +152,14 @@ const AuthCalculatorPage = () => {
         </div>
 
         <div className={styles.right}>
-          <SummaryCard date={today} dailyRate={dailyRate} consumed={0} />
+          <div className={styles.summaryBox}>
+            <SummaryCard
+              date={todayLabel}
+              dailyRate={dailyRate}
+              consumed={consumedKcal}
+              forbiddenFoods={forbiddenFoods}
+            />
+          </div>
         </div>
       </div>
     </section>
