@@ -2,10 +2,10 @@ import React, { useState } from "react";
 import css from "./DailyCaloriesForm.module.css";
 
 const BLOOD_GROUPS = [
-  { label: "0", value: "1" },
-  { label: "AB", value: "2" },
-  { label: "A", value: "3" },
-  { label: "B", value: "4" },
+  { label: "1", value: "1" },
+  { label: "2", value: "2" },
+  { label: "3", value: "3" },
+  { label: "4", value: "4" },
 ];
 
 const ACTIVITY_LEVELS = [
@@ -84,8 +84,8 @@ const DailyCaloriesForm = ({ onFormSubmit, isLoading }) => {
     age: "",
     currentWeight: "",
     desiredWeight: "",
-    bloodType: BLOOD_GROUPS[0].value,
-    activityLevel: ACTIVITY_LEVELS[2].value,
+    bloodType: "",
+    activityLevel: "",
   });
   const [errors, setErrors] = useState({});
 
@@ -182,8 +182,8 @@ const DailyCaloriesForm = ({ onFormSubmit, isLoading }) => {
       age: "",
       currentWeight: "",
       desiredWeight: "",
-      bloodType: BLOOD_GROUPS[0].value,
-      activityLevel: ACTIVITY_LEVELS[2].value,
+      bloodType: "",
+      activityLevel: "",
     });
     setErrors({});
   };
@@ -194,94 +194,80 @@ const DailyCaloriesForm = ({ onFormSubmit, isLoading }) => {
         Calculate your daily calorie intake right now
       </h1>
       <form className={css.form} onSubmit={handleSubmit}>
-        {/* 1. Height */}
-        <div className={css.inputGroup}>
-          <input
-            className={`${css.inputField} ${
-              errors.height ? css.inputError : ""
-            }`}
-            type="text"
-            name="height"
-            placeholder="Height *"
-            inputMode="numeric"
-            pattern="[1-9][0-9]*"
-            maxLength={FIELD_RULES.height.maxLength}
-            value={formData.height}
-            onChange={handleChange}
-            onKeyDown={handleKeyDown}
-          />
-          {errors.height && (
-            <span className={css.errorMessage}>{errors.height}</span>
-          )}
+        {/* Row 1: Height + Desired weight */}
+        <div className={css.row}>
+          <div className={css.inputGroup}>
+            <label className={css.inputLabel}>
+              Height *
+              <input
+                className={`${css.inputField} ${
+                  errors.height ? css.inputError : ""
+                }`}
+                type="text"
+                name="height"
+                placeholder="Enter your height (cm)"
+                inputMode="numeric"
+                pattern="[1-9][0-9]*"
+                maxLength={FIELD_RULES.height.maxLength}
+                value={formData.height}
+                onChange={handleChange}
+                onKeyDown={handleKeyDown}
+              />
+            </label>
+            {errors.height && (
+              <span className={css.errorMessage}>{errors.height}</span>
+            )}
+          </div>
+
+          <div className={css.inputGroup}>
+            <label className={css.inputLabel}>
+              Desired weight *
+              <input
+                className={`${css.inputField} ${
+                  errors.desiredWeight ? css.inputError : ""
+                }`}
+                type="text"
+                name="desiredWeight"
+                placeholder="Target weight (kg)"
+                inputMode="numeric"
+                pattern="[1-9][0-9]*"
+                maxLength={FIELD_RULES.desiredWeight.maxLength}
+                value={formData.desiredWeight}
+                onChange={handleChange}
+                onKeyDown={handleKeyDown}
+              />
+            </label>
+            {errors.desiredWeight && (
+              <span className={css.errorMessage}>{errors.desiredWeight}</span>
+            )}
+          </div>
         </div>
-        {/* 2. Age */}
-        <div className={css.inputGroup}>
-          <input
-            className={`${css.inputField} ${errors.age ? css.inputError : ""}`}
-            type="text"
-            name="age"
-            placeholder="Age *"
-            inputMode="numeric"
-            pattern="[1-9][0-9]*"
-            maxLength={FIELD_RULES.age.maxLength}
-            value={formData.age}
-            onChange={handleChange}
-            onKeyDown={handleKeyDown}
-          />
-          {errors.age && <span className={css.errorMessage}>{errors.age}</span>}
-        </div>
-        {/* 3. Current Weight */}
-        <div className={css.inputGroup}>
-          <input
-            className={`${css.inputField} ${
-              errors.currentWeight ? css.inputError : ""
-            }`}
-            type="text"
-            name="currentWeight"
-            placeholder="Current Weight *"
-            inputMode="numeric"
-            pattern="[1-9][0-9]*"
-            maxLength={FIELD_RULES.currentWeight.maxLength}
-            value={formData.currentWeight}
-            onChange={handleChange}
-            onKeyDown={handleKeyDown}
-          />
-          {errors.currentWeight && (
-            <span className={css.errorMessage}>{errors.currentWeight}</span>
-          )}
-        </div>
-        {/* 4. Desired Weight */}
-        <div className={css.inputGroup}>
-          <input
-            className={`${css.inputField} ${
-              errors.desiredWeight ? css.inputError : ""
-            }`}
-            type="text"
-            name="desiredWeight"
-            placeholder="Desired Weight *"
-            inputMode="numeric"
-            pattern="[1-9][0-9]*"
-            maxLength={FIELD_RULES.desiredWeight.maxLength}
-            value={formData.desiredWeight}
-            onChange={handleChange}
-            onKeyDown={handleKeyDown}
-          />
-          {errors.desiredWeight && (
-            <span className={css.errorMessage}>{errors.desiredWeight}</span>
-          )}
-        </div>
-        {/* 5. Blood Type */}
-        <div
-          className={`${css.radioGroup} ${
-            errors.bloodType ? css.groupError : ""
-          }`}
-        >
-          <span className={css.radioLabel}>Blood Type *</span>
-          <div className={css.radioOptions}>
-            {BLOOD_GROUPS.map(
-              (
-                type
-              ) => (
+
+        {/* Row 2: Age + Blood type */}
+        <div className={css.row}>
+          <div className={css.inputGroup}>
+            <label className={css.inputLabel}>
+              Age *
+              <input
+                className={`${css.inputField} ${errors.age ? css.inputError : ""}`}
+                type="text"
+                name="age"
+                placeholder="How old are you?"
+                inputMode="numeric"
+                pattern="[1-9][0-9]*"
+                maxLength={FIELD_RULES.age.maxLength}
+                value={formData.age}
+                onChange={handleChange}
+                onKeyDown={handleKeyDown}
+              />
+            </label>
+            {errors.age && <span className={css.errorMessage}>{errors.age}</span>}
+          </div>
+
+          <div className={css.inputGroup}>
+            <span className={css.inputLabel}>Blood type *</span>
+            <div className={css.radioOptions}>
+              {BLOOD_GROUPS.map((type) => (
                 <label key={type.value} className={css.radioOption}>
                   <input
                     type="radio"
@@ -290,59 +276,78 @@ const DailyCaloriesForm = ({ onFormSubmit, isLoading }) => {
                     checked={formData.bloodType === type.value}
                     onChange={handleChange}
                   />
-                  <span className={css.customRadio}></span>
-                  {type.label}
+                  <span>{type.label}</span>
                 </label>
-              )
+              ))}
+            </div>
+            {errors.bloodType && (
+              <span className={css.errorMessage}>{errors.bloodType}</span>
             )}
           </div>
-          {errors.bloodType && (
-            <span className={`${css.errorMessage} ${css.radioError}`}>
-              {errors.bloodType}
-            </span>
-          )}
         </div>
-        {/* 6. Activity Level */}
-        <div
-          className={`${css.radioGroup} ${css.activityGroup} ${
-            errors.activityLevel ? css.groupError : ""
-          }`}
+
+        {/* Row 3: Current weight */}
+        <div className={css.row}>
+          <div className={`${css.inputGroup} ${css.fullWidth}`}>
+            <label className={css.inputLabel}>
+              Current weight *
+              <input
+                className={`${css.inputField} ${
+                  errors.currentWeight ? css.inputError : ""
+                }`}
+                type="text"
+                name="currentWeight"
+                placeholder="Your current weight (kg)"
+                inputMode="numeric"
+                pattern="[1-9][0-9]*"
+                maxLength={FIELD_RULES.currentWeight.maxLength}
+                value={formData.currentWeight}
+                onChange={handleChange}
+                onKeyDown={handleKeyDown}
+              />
+            </label>
+            {errors.currentWeight && (
+              <span className={css.errorMessage}>{errors.currentWeight}</span>
+            )}
+          </div>
+        </div>
+
+        {/* Row 4: Activity level */}
+        <div className={css.row}>
+          <div className={`${css.inputGroup} ${css.fullWidth}`}>
+            <label className={css.inputLabel}>
+              Activity level *
+              <select
+                name="activityLevel"
+                value={formData.activityLevel}
+                onChange={handleChange}
+                className={`${css.inputField} ${
+                  errors.activityLevel ? css.inputError : ""
+                }`}
+              >
+                <option value="" disabled>
+                  Select activity level
+                </option>
+                {ACTIVITY_LEVELS.map((level) => (
+                  <option key={level.value} value={level.value}>
+                    {level.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            {errors.activityLevel && (
+              <span className={css.errorMessage}>{errors.activityLevel}</span>
+            )}
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          className={`calculation-btn ${css.submitBtn}`}
+          disabled={isLoading}
         >
-          <span className={css.radioLabel}>Activity Level *</span>
-          <div className={css.radioOptions}>
-            {ACTIVITY_LEVELS.map(
-              (
-                level
-              ) => (
-                <label key={level.value} className={css.radioOption}>
-                  <input
-                    type="radio"
-                    name="activityLevel"
-                    value={level.value}
-                    checked={formData.activityLevel === level.value}
-                    onChange={handleChange}
-                  />
-                  <span className={css.customRadio}></span>
-                  {level.label}
-                </label>
-              )
-            )}
-          </div>
-          {errors.activityLevel && (
-            <span className={`${css.errorMessage} ${css.radioError}`}>
-              {errors.activityLevel}
-            </span>
-          )}
-        </div>
-        <div className={css.buttonWrapper}>
-          <button
-            type="submit"
-            className={`calculation-btn ${css.submitBtn}`}
-            disabled={isLoading}
-          >
-            {isLoading ? "Calculating..." : "Start losing weight"}
-          </button>
-        </div>
+          {isLoading ? "Calculating..." : "Start losing weight"}
+        </button>
       </form>
     </div>
   );
