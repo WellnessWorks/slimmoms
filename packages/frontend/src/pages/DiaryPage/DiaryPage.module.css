@@ -406,10 +406,27 @@
     align-self: flex-end;
   }
 }
+.warning {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #fc842d;
+}
 
 /* =========================
    DESKTOP ( >=1280px )
    ========================= */
+.tableWrapper::-webkit-scrollbar {
+  width: 6px;
+}
+
+.tableWrapper::-webkit-scrollbar-thumb {
+  background: #fc842d;
+  border-radius: 8px;
+}
+
+.tableWrapper::-webkit-scrollbar-track {
+  background: #f2f2f2;
+}
 
 
 @media (min-width: 1280px) {
@@ -452,9 +469,11 @@
     margin-bottom: 32px;  
   }
   
-   .tableWrapper {
-    max-height: 480px !important;  /* önce 260–280 idi, şimdi çok daha büyük */
-    min-height: 380px;              /* her zaman büyük görünmesi için */
+    .tableWrapper {
+    height: 420px;              /* 🔥 sabit yükseklik veriyoruz */
+    max-height: none;
+    overflow-y: auto !important; /* başka bir kuralı ezer */
+    overflow-x: hidden;
   }
   .dateRow {
     margin-bottom: 40px;

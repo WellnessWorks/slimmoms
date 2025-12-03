@@ -3,6 +3,7 @@ import React, { useEffect, useState, useMemo } from "react";
 import { Navigate } from "react-router-dom";
 import { userTransactionApi } from "../../api/userTransactionApi";
 import SummaryCard from "../../components/SummaryCards/SummaryCard";
+import Loader from "../../components/Loader/Loader";
 import styles from "./DiaryPage.module.css";
 
 const DiaryPage = () => {
@@ -11,10 +12,10 @@ const DiaryPage = () => {
   // ---------- STATE ----------
   const [date, setDate] = useState(() => {
     const d = new Date();
-    const year = d.getFullYear();
-    const month = String(d.getMonth() + 1).padStart(2, "0");
-    const day = String(d.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`; // YYYY-MM-DD
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(
+      2,
+      "0"
+    )}-${String(d.getDate()).padStart(2, "0")}`;
   });
 
   const [dailyRate, setDailyRate] = useState(null);
@@ -30,30 +31,27 @@ const DiaryPage = () => {
   const [consumedKcal, setConsumedKcal] = useState(0);
 
   const [error, setError] = useState(null);
+  const [warning, setWarning] = useState(null); // 🔥 forbidden uyarısı
   const [isLoadingDay, setIsLoadingDay] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
 
-  // mobil mi?
   const [isMobile, setIsMobile] = useState(
     typeof window !== "undefined" ? window.innerWidth <= 704 : false
   );
-  // mobilde “Add ekranı” açık mı?
   const [isMobileAddMode, setIsMobileAddMode] = useState(false);
+
+  const [isPageLoading, setIsPageLoading] = useState(true);
 
   // ---------- WINDOW RESIZE ----------
   useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth <= 769
-
-      );
-    };
+    const handleResize = () => setIsMobile(window.innerWidth <= 769);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // ---------- PROFİL + FORBIDDEN (sayfaya girince) ----------
+  // ---------- PROFIL + FORBIDDEN FOODS ----------
   useEffect(() => {
-    if (!token) return; // token yoksa istek atma
+    if (!token) return;
 
     const loadProfile = async () => {
       try {
@@ -63,11 +61,8 @@ const DiaryPage = () => {
 
         const user = data.user || data;
 
-        if (typeof user.dailyCalorieGoal === "number") {
-          setDailyRate(user.dailyCalorieGoal);
-        } else if (typeof user.dailyRate === "number") {
-          setDailyRate(user.dailyRate);
-        }
+        if (user.dailyCalorieGoal) setDailyRate(user.dailyCalorieGoal);
+        if (user.dailyRate) setDailyRate(user.dailyRate);
 
         if (user.bloodGroup) {
           setUserBloodGroup(user.bloodGroup);
@@ -82,14 +77,14 @@ const DiaryPage = () => {
           }
         }
       } catch (err) {
-        console.error("PROFILE INIT ERROR:", err);
+        console.error("PROFILE ERROR:", err);
       }
     };
 
     loadProfile();
   }, [token]);
 
-  // ---------- BELİRLİ TARİHİN GÜN ÖZETİ ----------
+  // ---------- GÜN ÖZETİ ----------
   useEffect(() => {
     if (!token) return;
 
@@ -100,14 +95,11 @@ const DiaryPage = () => {
       try {
         const { data } = await userTransactionApi.get(
           `/api/v1/day/info?date=${date}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
+          { headers: { Authorization: `Bearer ${token}` } }
         );
 
-        const eaten = data.products || [];
         setEatenProducts(
-          eaten.map((p) => ({
+          (data.products || []).map((p) => ({
             id: p.id || p._id,
             title: p.title,
             weight: p.weight,
@@ -115,63 +107,43 @@ const DiaryPage = () => {
           }))
         );
 
-        if (typeof data.consumedCalories === "number") {
-          setConsumedKcal(data.consumedCalories);
-        } else {
-          setConsumedKcal(0);
-        }
-
-        if (typeof data.dailyGoal === "number") {
-          setDailyRate(data.dailyGoal);
-        }
+        setConsumedKcal(data.consumedCalories || 0);
+        setDailyRate(data.dailyGoal || dailyRate);
       } catch (err) {
         console.error("DAY INFO ERROR:", err);
-        setError(
-          err.response?.data?.message ||
-            "Could not load daily information for this date."
-        );
+        setError("Could not load daily information for this date.");
         setEatenProducts([]);
         setConsumedKcal(0);
       } finally {
         setIsLoadingDay(false);
+        setIsPageLoading(false);
       }
     };
 
     fetchDayInfo();
   }, [date, token]);
 
-  // ---------- ÜRÜN ARAMA (products/search) ----------
+  // ---------- ÜRÜN ARAMA ----------
   useEffect(() => {
     if (!token) return;
 
-    // Input boşsa listeyi temizle
-    if (!searchQuery.trim()) {
-      setSearchResults([]);
-      return;
-    }
+    if (!searchQuery.trim()) return setSearchResults([]);
 
-    // Kullanıcı listeden ürün seçtiyse ve input seçilen ürünün
-    // başlığını gösteriyorsa yeniden arama yapma → dropdown kapalı kalsın
-    if (selectedProduct && searchQuery === selectedProduct.title) {
-      return;
-    }
+    if (selectedProduct && searchQuery === selectedProduct.title) return;
 
-    const fetchSearch = async () => {
+    const delay = setTimeout(async () => {
       try {
         const { data } = await userTransactionApi.get(
           `/api/v1/products/search?query=${encodeURIComponent(searchQuery)}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
+          { headers: { Authorization: `Bearer ${token}` } }
         );
         setSearchResults(data.products || []);
       } catch (err) {
-        console.error("PRODUCT SEARCH ERROR:", err);
+        console.error("SEARCH ERROR:", err);
       }
-    };
+    }, 300);
 
-    const timeoutId = setTimeout(fetchSearch, 300);
-    return () => clearTimeout(timeoutId);
+    return () => clearTimeout(delay);
   }, [searchQuery, token, selectedProduct]);
 
   const handleSelectProduct = (product) => {
@@ -185,7 +157,10 @@ const DiaryPage = () => {
     e.preventDefault();
     if (!selectedProduct || !grams) return;
 
-    // ❌ Yasak ürün kontrolü
+    setError(null);
+    setWarning(null);
+
+    // Yasak ürün → EKLE ama UYAR
     if (
       userBloodGroup &&
       selectedProduct.groupBloodNotAllowed &&
@@ -193,13 +168,12 @@ const DiaryPage = () => {
     ) {
       const index = Number(userBloodGroup) - 1;
       if (selectedProduct.groupBloodNotAllowed[index]) {
-        setError("This product is not recommended for your blood group.");
-        return;
+        setWarning("⚠️ This product is not recommended for your blood group.");
+        // return YOK → ürün eklenmeye devam edecek
       }
     }
 
     setIsAdding(true);
-    setError(null);
 
     try {
       const body = {
@@ -211,9 +185,7 @@ const DiaryPage = () => {
       const { data } = await userTransactionApi.post(
         "/api/v1/day/add-product",
         body,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
 
       const day = data.day;
@@ -229,20 +201,14 @@ const DiaryPage = () => {
         setConsumedKcal(day.totalCalories);
       }
 
-      // inputları temizle
-      setGrams("");
       setSearchQuery("");
       setSelectedProduct(null);
+      setGrams("");
 
-      // mobil “Add ekranı” ise geri dön
-      if (isMobile) {
-        setIsMobileAddMode(false);
-      }
+      if (isMobile) setIsMobileAddMode(false);
     } catch (err) {
       console.error("ADD PRODUCT ERROR:", err);
-      setError(
-        err.response?.data?.message || "Could not add this product to your day."
-      );
+      setError("Could not add this product.");
     } finally {
       setIsAdding(false);
     }
@@ -272,11 +238,11 @@ const DiaryPage = () => {
         setConsumedKcal(day.totalCalories);
       }
     } catch (err) {
-      console.error("DELETE PRODUCT ERROR:", err);
+      console.error("DELETE ERROR:", err);
     }
   };
 
-  // ---------- GÖRSEL LABEL / HESAPLAMALAR ----------
+  // ---------- LABEL / HESAPLAMALAR ----------
   const dateLabel = useMemo(() => {
     const d = new Date(date);
     return d.toLocaleDateString("tr-TR", {
@@ -291,12 +257,16 @@ const DiaryPage = () => {
     return Math.round((consumedKcal / dailyRate) * 100);
   }, [dailyRate, consumedKcal]);
 
-  // 🔒 BÜTÜN HOOK’LARDAN SONRA token kontrolü
   if (!token) return <Navigate to="/login" replace />;
 
-  // ------------------------------------------------------------------
-  // MOBİL ADD SCREEN
-  // ------------------------------------------------------------------
+  // ---------- FULL SCREEN LOADER ----------
+  if (isPageLoading) {
+    return <Loader full size={60} />;
+  }
+
+  // =====================================================================
+  // MOBIL ADD SCREEN
+  // =====================================================================
   if (isMobile && isMobileAddMode) {
     return (
       <section className={styles.page}>
@@ -347,8 +317,8 @@ const DiaryPage = () => {
                   <input
                     className={styles.input}
                     type="number"
-                    min="1"
                     value={grams}
+                    min="1"
                     onChange={(e) => setGrams(e.target.value)}
                     placeholder="100"
                   />
@@ -356,6 +326,7 @@ const DiaryPage = () => {
               </div>
 
               {error && <p className={styles.error}>{error}</p>}
+              {warning && <p className={styles.warning}>{warning}</p>}
 
               <button
                 type="submit"
@@ -371,29 +342,26 @@ const DiaryPage = () => {
     );
   }
 
-  // ------------------------------------------------------------------
-  // NORMAL EKRAN (desktop / tablet + mobil liste görünümü)
-  // ------------------------------------------------------------------
+  // =====================================================================
+  // NORMAL SCREEN
+  // =====================================================================
   return (
     <section className={styles.page}>
       <div className={styles.inner}>
-        {/* SOL KOLON: tarih + liste + (desktop form) */}
         <div className={styles.left}>
           <div className={styles.dateRow}>
             <span className={styles.dateText}>{dateLabel}</span>
 
-            {/* Takvim butonu */}
             <button
-  type="button"
-  className={styles.calendarBtn}
-  onClick={() => document.getElementById("hiddenDatePicker").showPicker()}
-  aria-label="Select date"
->
-  <span className={styles.calendarIcon} />
-</button>
+              type="button"
+              className={styles.calendarBtn}
+              onClick={() =>
+                document.getElementById("hiddenDatePicker").showPicker()
+              }
+            >
+              <span className={styles.calendarIcon} />
+            </button>
 
-
-            {/* GİZLİ INPUT */}
             <input
               id="hiddenDatePicker"
               type="date"
@@ -403,7 +371,6 @@ const DiaryPage = () => {
             />
           </div>
 
-          {/* Desktop & tablet: form yukarıda, mobilde form yok (sadece liste + +) */}
           {!isMobile && (
             <form className={styles.form} onSubmit={handleAddProduct}>
               <div className={styles.formRow}>
@@ -456,17 +423,15 @@ const DiaryPage = () => {
               </div>
 
               {error && <p className={styles.error}>{error}</p>}
+              {warning && <p className={styles.warning}>{warning}</p>}
             </form>
           )}
 
-          {/* TABLO */}
           <div className={styles.tableWrapper}>
             {isLoadingDay ? (
               <p>Loading day...</p>
             ) : eatenProducts.length === 0 ? (
-              <p className={styles.emptyText}>
-                You have not added any products yet.
-              </p>
+              <p className={styles.emptyText}>You have not added any products yet.</p>
             ) : (
               <table className={styles.table}>
                 <thead>
@@ -479,17 +444,15 @@ const DiaryPage = () => {
                 </thead>
                 <tbody>
                   {eatenProducts.map((item) => (
-                    <tr key={item.id || item._id}>
+                    <tr key={item.id}>
                       <td>{item.title}</td>
                       <td>{item.weight}</td>
-                      <td>{Math.round(item.calories || 0)}</td>
+                      <td>{Math.round(item.calories)}</td>
                       <td>
                         <button
                           type="button"
                           className={styles.deleteBtn}
-                          onClick={() =>
-                            handleDeleteProduct(item.id || item._id)
-                          }
+                          onClick={() => handleDeleteProduct(item.id)}
                         >
                           ✕
                         </button>
@@ -501,7 +464,6 @@ const DiaryPage = () => {
             )}
           </div>
 
-          {/* Mobilde, alt ortada turuncu + → Add ekranı */}
           {isMobile && (
             <>
               <button
@@ -512,7 +474,6 @@ const DiaryPage = () => {
                 +
               </button>
 
-              {/* Mobilde summary solda listenin altında */}
               <div className={styles.summaryBox}>
                 <SummaryCard
                   date={dateLabel}
@@ -526,7 +487,6 @@ const DiaryPage = () => {
           )}
         </div>
 
-        {/* SAĞ KOLON: desktop/tablet için Summary */}
         {!isMobile && (
           <div className={styles.right}>
             <div className={styles.summaryBox}>

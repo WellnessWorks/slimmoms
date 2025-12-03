@@ -6,6 +6,7 @@ import User from "../models/User.js";
 
 // --- 8. Madde: Ürün Ekleme Endpoint'i ---
 // POST /api/v1/day/add-product
+
 const addProductToDay = asyncHandler(async (req, res) => {
   const userId = req.user._id; // protect middleware'den gelir
   const { date, productId, weight } = req.body;
@@ -18,31 +19,32 @@ const addProductToDay = asyncHandler(async (req, res) => {
   // Tarihi sadece gün, ay, yıl olacak şekilde standartlaştır
   const standardDate = new Date(new Date(date).setHours(0, 0, 0, 0));
 
-  // 2. Product'ı bul
+  // Product'ı bul
   const product = await Product.findById(productId);
   if (!product) {
     res.status(404);
     throw new Error("Product not found.");
   }
 
-  // 🔥 Kullanıcının kan grubuna göre bu ürün YASAK mı?
+  // Kullanıcının kan grubuna göre bu ürün YASAK mı? (SADECE HESAPLA, BLOK YOK)
   const user = await User.findById(userId).select("bloodGroup");
-  const bloodGroupIndex = Number(user?.bloodGroup);
 
+  let isForbiddenForUser = false;
+
+  const bloodGroupIndex = Number(user?.bloodGroup);
   if (
     bloodGroupIndex >= 1 &&
     bloodGroupIndex <= 4 &&
-    Array.isArray(product.groupBloodNotAllowed) &&
-    product.groupBloodNotAllowed[bloodGroupIndex] === true
+    Array.isArray(product.groupBloodNotAllowed)
   ) {
-    res.status(400);
-    throw new Error("This product is not allowed for your blood group.");
+    const idx = bloodGroupIndex - 1; // 1–4 → 0–3
+    isForbiddenForUser = !!product.groupBloodNotAllowed[idx];
   }
 
-  // 3. Tüketilen kalori miktarını hesapla (product.calories 100 g içindir)
+  // Tüketilen kalori miktarını hesapla (product.calories 100 g içindir)
   const consumedCalories = (product.calories / 100) * weight;
 
-  // 4. Günlük kaydı bul veya oluştur
+  // Günlük kaydı bul veya oluştur
   let dayEntry = await Day.findOne({ userId, date: standardDate });
 
   if (!dayEntry) {
@@ -54,15 +56,16 @@ const addProductToDay = asyncHandler(async (req, res) => {
     });
   }
 
-  // 5. Ürünü Günlük Kayıt listesine ekle
+  // Ürünü Günlük Kayıt listesine ekle
   dayEntry.consumedProducts.push({
     productId: product._id,
     title: product.title,
     weight: weight,
     calories: consumedCalories,
+    isForbiddenForUser, // ister kullan ister kullanma, dursun
   });
 
-  // 6. Toplam kaloriyi güncelle
+  // Toplam kaloriyi güncelle
   dayEntry.totalCalories += consumedCalories;
 
   await dayEntry.save();
@@ -70,9 +73,11 @@ const addProductToDay = asyncHandler(async (req, res) => {
   res.status(201).json({
     status: "success",
     day: dayEntry,
+    isForbiddenForUser, // frontend isterse buradan da görebilir
     message: `${product.title} added successfully.`,
   });
 });
+
 
 // --- 9. Madde: Ürün Silme Endpoint'i ---
 // DELETE /api/v1/day/delete-product

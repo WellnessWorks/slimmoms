@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const BASE_URL =
-  import.meta.env.VITE_BACKEND_URL || "http://localhost:4000";
+  import.meta.env.VITE_BACKEND_URL || "https://slimmoms-j4sf.onrender.com";
 
 export const userTransactionApi = axios.create({
   baseURL: BASE_URL,
