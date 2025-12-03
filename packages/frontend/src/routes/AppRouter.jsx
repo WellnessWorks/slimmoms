@@ -34,6 +34,7 @@ const AppRouter = () => {
     <BrowserRouter>
       <Suspense fallback={<Loader full size={60} />}>
         <Routes>
+          {/* Tüm sayfalar Layout altında */}
           <Route path="/" element={<Layout />}>
             <Route
               index
