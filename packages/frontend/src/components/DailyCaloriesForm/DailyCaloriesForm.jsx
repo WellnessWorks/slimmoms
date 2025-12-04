@@ -2,10 +2,10 @@ import React, { useState } from "react";
 import css from "./DailyCaloriesForm.module.css";
 
 const BLOOD_GROUPS = [
-  { label: "1", value: "1" },
-  { label: "2", value: "2" },
-  { label: "3", value: "3" },
-  { label: "4", value: "4" },
+  { label: "A", value: "A" },
+  { label: "B", value: "B" },
+  { label: "AB", value: "AB" },
+  { label: "0", value: "0" },
 ];
 
 const ACTIVITY_LEVELS = [
@@ -63,7 +63,7 @@ const validateForm = (data) => {
 
   if (
     !parsedData.bloodType ||
-    !["1", "2", "3", "4"].includes(parsedData.bloodType)
+    !["A", "B", "AB", "0"].includes(parsedData.bloodType)
   ) {
     errors.bloodType = "Blood type is required.";
   }
