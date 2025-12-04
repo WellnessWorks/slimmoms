@@ -4,7 +4,48 @@
 }
 
 .mainContent {
-    padding-top: 52px; 
+    padding-top: 32px; 
     padding-left: 20px;
     padding-right: 20px;
+}
+
+@media (min-width: 768px){
+  .mainContent {
+    padding-top: 40px;
+    padding-left: 32px;
+    padding-right: 32px;
+  }
+    .mainPageWrapper {
+    height: 100vh;
+    overflow: hidden;
+    background-image: url("../../assets/img/tablet-auth-background1x.webp");
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: right;
+  }
+
+  @media (min-resolution: 2dppx) {
+    .mainPageWrapper {
+      background-image: url("../../assets/img/tablet-auth-background2x.webp");
+    }
+}
+}
+@media (min-width: 1280px){
+  .mainContent {
+    margin-top: 110px;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+   .mainPageWrapper {
+    background-image: url("../../assets/img/desktop-background1x.webp");
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: right;
+  }
+
+  @media (min-resolution: 2dppx) {
+    .mainPageWrapper {
+      background-image: url("../../assets/img/desktop-background2x.webp");
+    }
+}
 }

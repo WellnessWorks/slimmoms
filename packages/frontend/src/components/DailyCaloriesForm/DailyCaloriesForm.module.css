@@ -1,37 +1,59 @@
 .formContainer {
   max-width: 320px;
-  margin-top: 32px;
   padding-left: 20px;
   padding-right: 20px;
   overflow-x: hidden;
 }
 
+.row {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
 .inputGroup {
   display: flex;
   flex-direction: column;
-  margin-bottom: 32px;
+}
+
+.fullWidth {
+  width: 100%;
 }
 
 .inputLabel {
-  display: block;
   font-size: 14px;
-  font-weight: bold;
-  margin-bottom: 8px;
   color: #9b9faa;
+  margin-bottom: 8px;
 }
 
 .inputField {
-  height: 24px;
-  box-sizing: border-box;
+  width: 100%;
   border: none;
   border-bottom: 1px solid #e0e0e0;
-  background: transparent;
-  line-height: 24px;
+  padding: 4px 0 6px;
+  font-size: 16px;
   outline: none;
-  display: block;
-  padding: 0;
-  font-size: 14px;
-  font-weight: bold;
+}
+
+.inputField:focus {
+  border-bottom-color: #fc842d;
+}
+
+.inputField select,
+select.inputField {
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 4px 0 6px;
+  font-size: 16px;
+  outline: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.inputField select:focus,
+select.inputField:focus {
+  border-bottom-color: #fc842d;
 }
 
 .inputError {
@@ -39,60 +61,59 @@
 }
 
 .errorMessage {
-  color: #fc842d;
+  margin-top: 4px;
   font-size: 12px;
-  margin-top: 10px;
+  color: #e53935;
 }
 
 .form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
   margin-top: 34px;
   width: 240px;
   box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
 }
 
 .radioGroup {
   display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  width: 240px;
-  height: auto;
-  gap: 8px 20px;
-  margin-bottom: 40px;
+  flex-direction: column;
+  gap: 16px;
 }
 
 .radioLabel {
-  cursor: pointer;
   font-size: 14px;
-  font-weight: bold;
   color: #9b9faa;
   margin-bottom: 8px;
-  width: 100%;
 }
 
-.activityGroup {
-  flex-direction: column;
-}
-
-.activityGroup .radioOption {
+.radioOptions {
   display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  margin-top: 10px;
-}
-
-.activityGroup .customRadio {
-  flex-shrink: 0;
-  margin-top: 5px;
+  align-items: center;
+  gap: 16px;
+  margin-top: 8px;
+  flex-wrap: wrap;
 }
 
 .radioOption {
-  color: #9b9faa;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #9b9faa;
 }
+
+.radioOption input[type="radio"] {
+  display: inline-block;
+  appearance: auto;
+  -webkit-appearance: radio;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: #fc842d;
+}
+
 .customRadio {
   width: 14px;
   height: 14px;
@@ -128,103 +149,99 @@ input[type="radio"] {
   -webkit-appearance: none;
   -moz-appearance: none;
 }
-.buttonWrapper {
-  display: flex;
-  justify-content: center;
-  width: 100%;
-  margin-top: 40px;
+
+.activityGroup {
+  flex-direction: column;
 }
+
+.activityGroup .radioOption {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.activityGroup .customRadio {
+  flex-shrink: 0;
+  margin-top: 5px;
+}
+
 .submitBtn {
-  white-space: nowrap;
-  padding: 13px 25px;
-  width: 210px;
-  height: 43px;
-  display: block;
-  margin-bottom: 100px;
-  background-color: var(--accent, #fc842d);
-  color: #fff;
-  border: none;
+  align-self: flex-start;
+  margin-top: 16px;
+  padding: 12px 32px;
   border-radius: 30px;
+  border: none;
+  background-color: #fc842d;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 14px;
   cursor: pointer;
-  font-weight: bold;
+  white-space: nowrap;
+}
+
+.submitBtn:hover {
+  opacity: 0.9;
 }
 
 @media (min-width: 768px) {
   .formContainer {
     max-width: 704px;
-    margin-top: 100px;
-    padding-left: 32px;
-    padding-right: 32px;
+    padding-left: 0;
+    padding-right: 0;
   }
 
   .form {
     margin-top: 68px;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 40px 32px;
     width: 512px;
-    height: auto;
-    box-sizing: content-box;
+    gap: 24px;
+  }
+
+  .row {
+    flex-direction: row;
   }
 
   .inputGroup {
-    width: 240px;
-    margin-bottom: 20px;
+    flex: 1;
   }
 
-  .activityGroup .radioOptions {
-    display: grid;
-    grid-template-columns: repeat(1, 1fr);
-    gap: 20px 32px;
-  }
-
-  .radioGroup {
-    grid-column: 1 / span 2;
-    width: 100%;
-    gap: 10px;
-    font-weight: bold;
-    margin-bottom: 20px;
-  }
-
-  .radioLabel {
-    border-bottom: 1px solid #e0e0e0;
-    padding-bottom: 20px;
-  }
-  .radioOptions {
-    display: flex;
-    gap: 28px;
-  }
-
-  .buttonWrapper {
-    grid-column: 1 / span 2;
-    display: flex;
-    justify-content: flex-start;
-    align-self: flex-start;
-    margin-top: 60px;
+  .submitBtn {
+    margin-top: 24px;
   }
 }
 
 @media (min-width: 1280px) {
   .formContainer {
     max-width: 608px;
-    margin-top: 144px;
-    padding-left: 16px;
-    padding-right: 16px;
+    margin-top: 0;
+    padding-left: 0;
+    padding-right: 0;
+    position: relative;
+    z-index: 1;
+    overflow-x: visible;
   }
 
   .form {
-    gap: 60px 32px;
+    width: 100%;
+    gap: 24px;
   }
 
-  .buttonWrapper {
-    grid-column: 1 / span 2;
-    display: flex;
-    justify-content: flex-end;
-    align-self: flex-start;
-    margin-top: 28px;
+  .row {
+    flex-direction: row;
+  }
+
+  .inputGroup {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .inputField {
+    width: 100%;
+    min-width: 0;
   }
 
   .submitBtn {
-    margin-bottom: 111px;
+    margin-top: 10px;
+    align-self: flex-end;
   }
 }
