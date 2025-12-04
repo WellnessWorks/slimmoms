@@ -95,7 +95,7 @@ export const register = createAsyncThunk(
 // LOGOUT
 export const logOut = createAsyncThunk("auth/logout", async (_, thunkAPI) => {
   try {
-    await userTransactionApi.delete("/api/v1/auth/logout");
+    await userTransactionApi.post("/api/v1/auth/logout");
   } catch (error) {
     return handleAuthError(error, thunkAPI);
   } finally {
