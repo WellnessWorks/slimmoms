@@ -4,20 +4,24 @@
 }
 
 .mainContent {
-    padding-top: 32px; 
-    padding-left: 20px;
-    padding-right: 20px;
+  padding-top: 32px;
+  padding-left: 20px;
+  padding-right: 20px;
+  max-width: 320px;
+  margin: 0 auto;
 }
 
 @media (min-width: 768px){
   .mainContent {
-    padding-top: 40px;
+    padding-top: 100px;
     padding-left: 32px;
     padding-right: 32px;
+    max-width: 704px;
+    margin: 0 auto;
   }
-    .mainPageWrapper {
+  .mainPageWrapper {
     height: 100vh;
-    overflow: hidden;
+    overflow-x: hidden;
     background-image: url("../../assets/img/tablet-auth-background1x.webp");
     background-repeat: no-repeat;
     background-size: contain;
@@ -35,8 +39,12 @@
     margin-top: 110px;
     padding-left: 16px;
     padding-right: 16px;
+    max-width: 1280px;
+    margin-left: auto;
+    margin-right: auto;
   }
-   .mainPageWrapper {
+
+  .mainPageWrapper {
     background-image: url("../../assets/img/desktop-background1x.webp");
     background-repeat: no-repeat;
     background-size: contain;
