@@ -7,6 +7,8 @@ import { refreshUser } from "../redux/auth/authOperations";
 import PrivateRoute from "./PrivateRoute";
 import RestrictedRoute from "./RestrictedRoute";
 
+import Loader from "../components/Loader/Loader"; // 🔥 Loader import
+
 // Lazy-loaded sayfalar
 const MainPage = React.lazy(() => import("../pages/MainPage/MainPage"));
 const LoginPage = React.lazy(() => import("../pages/LoginPage/LoginPage"));
@@ -30,39 +32,33 @@ const AppRouter = () => {
 
   return (
     <BrowserRouter>
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<Loader full size={60} />}>
         <Routes>
           {/* Tüm sayfalar Layout altında */}
           <Route path="/" element={<Layout />}>
-            {/* 🔒 MAIN */}
             <Route
               index
               element={
-                <RestrictedRoute redirectTo="/calculator">
+                <RestrictedRoute>
                   <MainPage />
                 </RestrictedRoute>
               }
             />
 
-            {/* 🔒 LOGIN & REGISTER */}
-            <Route
-              path="login"
-              element={
-                <RestrictedRoute redirectTo="/calculator">
-                  <LoginPage />
-                </RestrictedRoute>
-              }
-            />
+            {/* LOGIN: Artık RestrictedRoute YOK */}
+            <Route path="login" element={<LoginPage />} />
+
+            {/* REGISTER */}
             <Route
               path="register"
               element={
-                <RestrictedRoute redirectTo="/calculator">
+                <RestrictedRoute redirectTo="/login">
                   <RegistrationPage />
                 </RestrictedRoute>
               }
             />
 
-            {/* 🔐 CALCULATOR */}
+            {/* PRIVATE ROUTES */}
             <Route
               path="calculator"
               element={
@@ -71,8 +67,6 @@ const AppRouter = () => {
                 </PrivateRoute>
               }
             />
-
-            {/* 🔐 DIARY */}
             <Route
               path="diary"
               element={
@@ -87,5 +81,4 @@ const AppRouter = () => {
     </BrowserRouter>
   );
 };
-
 export default AppRouter;

@@ -14,3 +14,7 @@ export const setToken = (token) => {
 export const removeToken = () => {
   userTransactionApi.defaults.headers.common.Authorization = "";
 };
+const savedToken = localStorage.getItem("token");
+if (savedToken) {
+  setToken(savedToken);
+}

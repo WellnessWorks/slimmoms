@@ -23,12 +23,17 @@ const handleFulfilled = (state, action) => {
 
 // Refresh durumu için yardımcı reducerlar
 const handleRefreshFulFilled = (state, action) => {
-  state.user = action.payload;
+  const { user, accessToken, refreshToken } = action.payload;
+
+  state.user = user || { name: null, email: null };
+  state.token = accessToken || null;
+  state.refreshToken = refreshToken || null;
   state.isLoggedIn = true;
   state.isRefreshing = false;
   state.isLoading = false;
   state.error = null;
 };
+
 
 const handleRefreshPending = (state) => {
   state.isRefreshing = true;

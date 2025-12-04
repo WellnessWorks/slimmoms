@@ -6,17 +6,22 @@ import SummaryCard from "../../components/SummaryCards/SummaryCard";
 import Loader from "../../components/Loader/Loader";
 import styles from "./DiaryPage.module.css";
 
+// 🔥 Yardımcı: Bugünün tarihini YYYY-MM-DD formatında verir
+const getTodayISO = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(
+    2,
+    "0"
+  )}-${String(d.getDate()).padStart(2, "0")}`;
+};
+
 const DiaryPage = () => {
   const token = localStorage.getItem("token");
 
   // ---------- STATE ----------
-  const [date, setDate] = useState(() => {
-    const d = new Date();
-    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(
-      2,
-      "0"
-    )}-${String(d.getDate()).padStart(2, "0")}`;
-  });
+  const [today] = useState(getTodayISO); // sadece 1 kere hesaplanır
+
+  const [date, setDate] = useState(today);
 
   const [dailyRate, setDailyRate] = useState(null);
   const [forbiddenFoods, setForbiddenFoods] = useState([]);
@@ -31,7 +36,7 @@ const DiaryPage = () => {
   const [consumedKcal, setConsumedKcal] = useState(0);
 
   const [error, setError] = useState(null);
-  const [warning, setWarning] = useState(null); // 🔥 forbidden uyarısı
+  const [warning, setWarning] = useState(null); // forbidden uyarısı
   const [isLoadingDay, setIsLoadingDay] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
 
@@ -156,6 +161,12 @@ const DiaryPage = () => {
   const handleAddProduct = async (e) => {
     e.preventDefault();
     if (!selectedProduct || !grams) return;
+
+    // 🔒 İleri tarihe ekleme engeli
+    if (date > today) {
+      setError("You can only add products for today or past dates.");
+      return;
+    }
 
     setError(null);
     setWarning(null);
@@ -367,7 +378,15 @@ const DiaryPage = () => {
               type="date"
               className={styles.hiddenDateInput}
               value={date}
-              onChange={(e) => setDate(e.target.value)}
+              max={today} // 🔒 ileri tarih seçilemez
+              onChange={(e) => {
+                const picked = e.target.value;
+                if (picked > today) {
+                  setDate(today); // ileri seçerse bugüne çek
+                } else {
+                  setDate(picked);
+                }
+              }}
             />
           </div>
 
