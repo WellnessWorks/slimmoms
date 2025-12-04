@@ -34,7 +34,6 @@ const handleRefreshFulFilled = (state, action) => {
   state.error = null;
 };
 
-
 const handleRefreshPending = (state) => {
   state.isRefreshing = true;
   state.isLoading = true;
@@ -48,6 +47,14 @@ const handleRefreshRejected = (state) => {
 };
 
 const handleLogOutFulfilled = (state) => {
+  state.user = { name: null, email: null };
+  state.token = null;
+  state.isLoggedIn = false;
+  state.isLoading = false;
+  state.error = null;
+};
+
+const handleLogOutRejected = (state) => {
   state.user = { name: null, email: null };
   state.token = null;
   state.isLoggedIn = false;
@@ -92,7 +99,7 @@ const authSlice = createSlice({
       //Logout durumları
       .addCase(logOut.pending, handlePending)
       .addCase(logOut.fulfilled, handleLogOutFulfilled)
-      .addCase(logOut.rejected, handleRejected);
+      .addCase(logOut.rejected, handleLogOutRejected);
   },
 });
 

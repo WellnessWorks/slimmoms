@@ -95,19 +95,16 @@ export const register = createAsyncThunk(
 // LOGOUT
 export const logOut = createAsyncThunk("auth/logout", async (_, thunkAPI) => {
   try {
-    const { data } = await userTransactionApi.delete("/api/v1/auth/logout");
-
+    await userTransactionApi.delete("/api/v1/auth/logout");
+  } catch (error) {
+    return handleAuthError(error, thunkAPI);
+  } finally {
     removeToken();
     localStorage.removeItem("token");
     localStorage.removeItem("refreshToken");
     localStorage.removeItem("email");
-
-    return data;
-  } catch (error) {
-    return handleAuthError(error, thunkAPI);
   }
 });
-
 
 // REFRESH USER
 export const refreshUser = createAsyncThunk(
