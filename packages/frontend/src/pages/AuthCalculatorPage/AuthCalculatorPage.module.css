@@ -192,30 +192,38 @@
 }
 
 
-
 /* ============================================
    SADECE MOBİLDE ( <768px ) 320px SABİT GENİŞLİK
    ============================================ */
 @media (max-width: 767px) {
   .page {
     max-width: 320px;
+    margin-left: auto;
+    margin-right: auto;      /* 🔥 page’i ortala */
   }
 
   .inner {
     max-width: 320px;
+    margin-left: auto;
+    margin-right: auto;      /* 🔥 inner’ı da ortala */
+  }
+
+  .left {
+    max-width: 320px;
+    margin-left: auto;
+    margin-right: auto;      /* 🔥 left ortada */
   }
 
   .right {
-    width: 320px;
+    width: 100%;
     max-width: 320px;
-    margin-left: auto;
-    margin-right: auto;
+    margin: 32px auto 0;     /* 🔥 right ortada */
   }
 
   .summaryBox {
     width: 100%;
-    max-width: 288px; /* 16px padding soldan + 16px padding sağdan */
+    max-width: 288px;        /* 16px padding soldan + sağdan */
     margin-left: auto;
-    margin-right: auto;
+    margin-right: auto;      /* 🔥 summary de ortada */
   }
 }
