@@ -3,7 +3,7 @@ import axios from "axios";
 import DailyCaloriesForm from "../../components/DailyCaloriesForm/DailyCaloriesForm";
 import Modal from "../../components/Modal/Modal";
 import DailyCalorieIntake from "../../components/DailyCalorieIntake/DailyCalorieIntake";
-import css from "./MainPage.module.css";
+import css from "./LandingPage.module.css";
 
 // ögeleri rastgele karıştırmak için shuffle fonksiyonu
 const shuffleArray = (array) => {
