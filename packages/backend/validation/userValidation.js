@@ -21,9 +21,6 @@ export const calorieInputSchema = Joi.object({
     "number.min": "Age must be at least 18.",
     "any.required": "Age is required.",
   }),
-  gender: Joi.string().valid("male", "female").required().messages({
-    "any.only": 'Gender must be "male" or "female".',
-  }),
   activityLevel: Joi.number()
     .valid(...ACTIVITY_LEVELS)
     .required()
@@ -48,7 +45,6 @@ export const updateUserSchema = Joi.object({
   weight: Joi.number().min(30).max(300),
   height: Joi.number().min(100).max(250),
   age: Joi.number().min(18).max(150),
-  gender: Joi.string().valid("male", "female"),
   activityLevel: Joi.number().valid(...ACTIVITY_LEVELS),
   targetWeight: Joi.number().min(30).max(300),
   bloodGroup: Joi.number().valid(...BLOOD_GROUPS),

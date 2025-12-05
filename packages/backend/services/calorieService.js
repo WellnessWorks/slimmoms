@@ -17,23 +17,12 @@ function calculateDailyCalorieIntake(
   weight,
   height,
   age,
-  gender,
   activityLevel,
   targetWeight
 ) {
-  let bmrAdjustment; // BMR + Hedef Ayarlaması
-
-  if (gender === "female") {
-    // KADINLAR İÇİN ÖZEL FORMÜL:
-    bmrAdjustment =
-      10 * weight +
-      6.25 * height -
-      5 * age -
-      161 -
-      10 * (weight - targetWeight);
-  } else {
-    throw new Error("Invalid gender specified.");
-  }
+  // Kadınlar için özel formül (her zaman uygulanacak)
+  const bmrAdjustment =
+    10 * weight + 6.25 * height - 5 * age - 161 - 10 * (weight - targetWeight);
 
   const factor =
     activityFactors[activityLevel] ||

@@ -31,7 +31,6 @@
           "weight",
           "height",
           "age",
-          "gender",
           "activityLevel",
           "targetWeight",
           "bloodGroup"
@@ -48,11 +47,6 @@
             "description": "Boy (cm)"
           },
           "age": { "type": "number", "example": 30, "description": "Yaş" },
-          "gender": {
-            "type": "string",
-            "example": "male",
-            "enum": ["male", "female"]
-          },
           "activityLevel": {
             "type": "number",
             "example": 1.5,
