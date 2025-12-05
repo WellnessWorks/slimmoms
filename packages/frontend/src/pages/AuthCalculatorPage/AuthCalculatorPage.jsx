@@ -105,7 +105,6 @@ const AuthCalculatorPage = () => {
         weight: Number(currentWeight),
         height: Number(height),
         age: Number(age),
-        gender: "female",
         activityLevel: Number(activityLevel),
         targetWeight: Number(desiredWeight),
         bloodGroup: Number(bloodType),

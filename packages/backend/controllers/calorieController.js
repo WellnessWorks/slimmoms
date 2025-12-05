@@ -10,7 +10,6 @@ const getCalculationData = async (
   weight,
   height,
   age,
-  gender,
   activityLevel,
   targetWeight,
   bloodGroup
@@ -20,7 +19,6 @@ const getCalculationData = async (
     !weight ||
     !height ||
     !age ||
-    !gender ||
     !activityLevel ||
     !targetWeight ||
     !bloodGroup
@@ -34,7 +32,6 @@ const getCalculationData = async (
     weight,
     height,
     age,
-    gender,
     activityLevel,
     targetWeight
   );
@@ -46,21 +43,13 @@ const getCalculationData = async (
 
 // --- 5. Madde: HERKESE AÇIK Hesaplama Rotası ---
 const publicCalorieIntake = asyncHandler(async (req, res) => {
-  const {
-    weight,
-    height,
-    age,
-    gender,
-    activityLevel,
-    targetWeight,
-    bloodGroup,
-  } = req.body;
+  const { weight, height, age, activityLevel, targetWeight, bloodGroup } =
+    req.body;
 
   const { dailyRate, forbiddenFoods } = await getCalculationData(
     weight,
     height,
     age,
-    gender,
     activityLevel,
     targetWeight,
     bloodGroup
@@ -81,14 +70,12 @@ const privateCalorieIntake = asyncHandler(async (req, res) => {
   const user = await User.findById(userId).select("bloodGroup");
   const bloodGroup = req.body.bloodGroup || user?.bloodGroup;
 
-  const { weight, height, age, gender, activityLevel, targetWeight } =
-    req.body;
+  const { weight, height, age, activityLevel, targetWeight } = req.body;
 
   const { dailyRate, forbiddenFoods } = await getCalculationData(
     weight,
     height,
     age,
-    gender,
     activityLevel,
     targetWeight,
     bloodGroup
@@ -103,7 +90,6 @@ const privateCalorieIntake = asyncHandler(async (req, res) => {
         weight,
         height,
         age,
-        gender,
         activityLevel,
         targetWeight,
         bloodGroup,
@@ -125,7 +111,7 @@ const getUserCalorieProfile = asyncHandler(async (req, res) => {
   const userId = req.user._id;
 
   const user = await User.findById(userId).select(
-    "dailyCalorieGoal weight height age gender activityLevel targetWeight bloodGroup"
+    "dailyCalorieGoal weight height age activityLevel targetWeight bloodGroup"
   );
 
   if (!user) {
@@ -141,7 +127,6 @@ const getUserCalorieProfile = asyncHandler(async (req, res) => {
       weight: user.weight,
       height: user.height,
       age: user.age,
-      gender: user.gender,
       activityLevel: user.activityLevel,
       targetWeight: user.targetWeight,
       bloodGroup: user.bloodGroup,

@@ -38,18 +38,14 @@ const userSchema = new mongoose.Schema(
     age: {
       type: Number,
     },
-    gender: {
-      type: String,
-      enum: ["male", "female"],
-    },
     activityLevel: {
-      type: Number,        // Şimdi NUMERIC
+      type: Number, // Şimdi NUMERIC
     },
     targetWeight: {
       type: Number,
     },
     bloodGroup: {
-      type: Number,        // 💉 Kan grubu eklendi
+      type: Number, // 💉 Kan grubu eklendi
     },
   },
   {

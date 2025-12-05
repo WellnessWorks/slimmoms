@@ -76,7 +76,6 @@ const MainPage = () => {
       weight: Number(formData.currentWeight),
       targetWeight: Number(formData.desiredWeight),
       bloodGroup: mappedBloodGroup,
-      gender: "female",
       activityLevel: activityLevelMultiplier,
     };
     const API_URL = "https://slimmoms-j4sf.onrender.com/api/v1/calories/intake";
