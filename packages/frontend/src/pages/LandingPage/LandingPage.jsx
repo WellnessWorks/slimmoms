@@ -39,7 +39,7 @@ const mapBloodGroup = (bloodType) => {
   return null;
 };
 
-const MainPage = () => {
+const LandingPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [dailyRate, setDailyRate] = useState(null);
   const [forbiddenFoods, setForbiddenFoods] = useState([]);
@@ -81,10 +81,7 @@ const MainPage = () => {
     const API_URL = "https://slimmoms-j4sf.onrender.com/api/v1/calories/intake";
 
     try {
-      console.log("Gönderilen Veri (Final):", requestBody);
       const response = await axios.post(API_URL, requestBody);
-
-      console.log("API Yanıtı:", response.data);
 
       const { dailyRate, forbiddenFoods: allForbiddenFoodsFromApi } =
         response.data;
@@ -93,22 +90,12 @@ const MainPage = () => {
 
       const randomFiveForbiddenFoods = shuffledFoods.slice(0, 5);
 
-      console.log(
-        "dailyRate:",
-        dailyRate,
-        "forbiddenFoods (Random 5):",
-        randomFiveForbiddenFoods
-      );
-
       setDailyRate(dailyRate);
       setForbiddenFoods(randomFiveForbiddenFoods);
 
       setIsModalOpen(true);
 
-      console.log("Modal state'i set edildi, isModalOpen: true");
     } catch (error) {
-      console.error("API'dan veri çekme hatası:", error);
-      console.error("Error response:", error.response?.data);
 
       let message = error.message || "Bilinmeyen bir hata oluştu.";
 
@@ -146,7 +133,7 @@ const MainPage = () => {
   }, [isModalOpen]);
 
   return (
-    <div className={css.mainPageWrapper}>
+    <div className={css.LandingPageWrapper}>
       <main className={css.mainContent}>
         <DailyCaloriesForm
           onFormSubmit={handleFormSubmit}
@@ -175,4 +162,4 @@ const MainPage = () => {
   );
 };
 
-export default MainPage;
+export default LandingPage;

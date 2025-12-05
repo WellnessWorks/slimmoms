@@ -1,4 +1,4 @@
-.mainPageWrapper {
+.LandingPageWrapper {
   min-height: 100vh;
   overflow-x: hidden;
 }
@@ -19,7 +19,7 @@
     max-width: 704px;
     margin: 0 auto;
   }
-  .mainPageWrapper {
+  .LandingPageWrapper {
     height: 100vh;
     overflow-x: hidden;
     background-image: url("../../assets/img/tablet-auth-background1x.webp");
@@ -29,7 +29,7 @@
   }
 
   @media (min-resolution: 2dppx) {
-    .mainPageWrapper {
+    .LandingPageWrapper {
       background-image: url("../../assets/img/tablet-auth-background2x.webp");
     }
 }
@@ -44,7 +44,7 @@
     margin-right: auto;
   }
 
-  .mainPageWrapper {
+  .LandingPageWrapper {
     background-image: url("../../assets/img/desktop-background1x.webp");
     background-repeat: no-repeat;
     background-size: contain;
@@ -52,7 +52,7 @@
   }
 
   @media (min-resolution: 2dppx) {
-    .mainPageWrapper {
+    .LandingPageWrapper {
       background-image: url("../../assets/img/desktop-background2x.webp");
     }
 }
