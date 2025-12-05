@@ -1,8 +1,3 @@
-/* =========================
-   MOBİL FIRST ( < 768px )
-   ========================= */
-
-/* Arka plan */
 .page {
   background: #fff;
   display: flex;
@@ -12,7 +7,6 @@
   width: 100%;
 }
 
-/* Ana konteyner */
 .inner {
   width: 100%;
   max-width: 480px;
@@ -21,18 +15,15 @@
   flex-direction: column;
 }
 
-/* Sol panel – mobilde tek panel */
 .left {
-  padding: 24px 16px 32px;
+  padding: 24px 16px 0px;
   margin-top: 10px;
 }
 
-/* Sağ panel sadece tablet/desktop’ta kullanılacak */
 .right {
   display: none;
 }
 
-/* Tarih satırı */
 .dateRow {
   display: flex;
   align-items: center;
@@ -46,7 +37,6 @@
   line-height: 1.2;
 }
 
-/* Takvim inputu (şu an gizli inputu kullanıyorsun ama dursun) */
 .dateInput {
   border: none;
   border-bottom: 1px solid #e0e0e0;
@@ -62,7 +52,6 @@
   border-color: #fc842d;
 }
 
-/* FORM (desktop/tablet ve mobil Add ekranında kullanılıyor) */
 .form {
   margin-bottom: 16px;
 }
@@ -105,7 +94,6 @@
   border-color: #fc842d;
 }
 
-/* Öneri listesi */
 .suggestions {
   position: absolute;
   top: 48px;
@@ -130,7 +118,6 @@
   background: #f5f6fb;
 }
 
-/* TABLO */
 .tableWrapper {
   margin-top: 8px;
   max-height: 280px;
@@ -153,7 +140,6 @@
   color: #9b9faa;
 }
 
-/* kolon genişlikleri → inputlarla hizalı */
 .table thead th:nth-child(1),
 .table tbody td:nth-child(1) {
   width: 55%;
@@ -182,7 +168,6 @@
   border-bottom: 1px solid #f1f2f3;
 }
 
-/* Silme butonu */
 .deleteBtn {
   border: none;
   background: transparent;
@@ -207,7 +192,6 @@
   color: #e53935;
 }
 
-/* Turuncu yuvarlak + (liste ekranında ve tablet/desktop’ta) */
 .addBtnCircle {
   width: 48px;
   height: 48px;
@@ -236,7 +220,6 @@
   justify-content: center;
 }
 
-/* Gri takvim ikonu */
 .calendarIcon {
   width: 18px;
   height: 18px;
@@ -246,7 +229,6 @@
   box-sizing: border-box;
 }
 
-/* Üst gri şerit */
 .calendarIcon::before {
   content: "";
   position: absolute;
@@ -257,7 +239,6 @@
   background: rgba(155, 159, 170, 1);
 }
 
-/* Üstteki iki küçük halka */
 .calendarIcon::after {
   content: "";
   position: absolute;
@@ -270,7 +251,6 @@
   border-right: 2px solid rgba(155, 159, 170, 1);
 }
 
-/* gizli input aynı kalsın */
 .hiddenDateInput {
   position: absolute;
   opacity: 0;
@@ -284,7 +264,6 @@
   cursor: not-allowed;
 }
 
-/* Mobil Add ekranında kullanılan turuncu buton */
 .addBtnMobile {
   width: 160px;
   height: 44px;
@@ -305,7 +284,6 @@
   cursor: not-allowed;
 }
 
-/* Mobil Add ekranı üst barı */
 .mobileAddHeader {
   display: flex;
   align-items: center;
@@ -325,53 +303,73 @@
   font-weight: 700;
 }
 
-/* Summary bölümü – mobilde alt tarafta gri blok */
 .summaryBox {
   background: #f5f6fb;
   margin-left: -16px;
   margin-right: -16px;
   margin-top: 120px;
-  height: 50%;
   padding: 24px 16px 32px;
 }
 
-/* =========================
-   TABLET ( >=768px )
-   ========================= */
-@media (min-width: 768px) and (max-width: 1279px) {
+.warning {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #fc842d;
+}
 
+.tableWrapper::-webkit-scrollbar {
+  width: 6px;
+}
+
+.tableWrapper::-webkit-scrollbar-thumb {
+  background: #fc842d;
+  border-radius: 8px;
+}
+
+.tableWrapper::-webkit-scrollbar-track {
+  background: #f2f2f2;
+}
+
+/* 768–1279: tablet için sağ panel + summary ayarları */
+@media (min-width: 768px) and (max-width: 1279px) {
   .right {
     position: relative;
     background-color: #f5f6fb;
     display: flex;
     flex: 1;
-    overflow: hidden; 
-    background-image: none !important; 
+    overflow: hidden;
+    background-image: none !important;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 360px;
+  }
+
+  .summaryBox {
+    background: transparent;
+    margin: 0;
+    padding: 32px 32px;
+    width: 100%;
+    max-width: 600px;
+    min-height: 260px;
+    height: auto;
   }
 
   .right::before {
     content: "";
     position: absolute;
-
-    
-    right: -40px;     
-    bottom: -180px;  
-
+    right: -50px;
+    bottom: -190px;
     width: 370px;
     height: 550px;
-
     background-image: url("../../assets/img/leaf-img1x.webp");
     background-repeat: no-repeat;
     background-size: contain;
-
-   
     transform: rotate(90deg);
-
     pointer-events: none;
   }
-
 }
 
+/* 768+ : tablet + desktop ortak kurallar */
 @media (min-width: 768px) {
   .page {
     max-width: 768px;
@@ -394,15 +392,14 @@
     box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
   }
 
-   
-    .summaryBox {
+  .summaryBox {
     margin-top: 0;
     margin-left: 0;
     margin-right: 0;
     padding: 48px 32px;
     width: 100%;
   }
- 
+
   .summaryBox > * {
     width: 100%;
   }
@@ -428,36 +425,10 @@
   .addBtnCircle {
     margin: 0 0 8px 8px;
     align-self: flex-end;
+    width: 62px;
+    height: 52px;
   }
-  .addBtnCircle {
-  width: 62px;
-  height: 52px;
 }
-}
-.warning {
-  margin-top: 8px;
-  font-size: 12px;
-  color: #fc842d;
-}
-.warning {
-  margin-top: 8px;
-  font-size: 12px;
-  color: #fc842d;
-}
-
-.tableWrapper::-webkit-scrollbar {
-  width: 6px;
-}
-
-.tableWrapper::-webkit-scrollbar-thumb {
-  background: #fc842d;
-  border-radius: 8px;
-}
-
-.tableWrapper::-webkit-scrollbar-track {
-  background: #f2f2f2;
-}
-
 
 @media (min-width: 1280px) {
   .page {
@@ -465,52 +436,61 @@
     margin: 0 auto;
     width: 100%;
   }
+
   .left {
+    margin-bottom: 150px;
     width: 540px;
   }
+
   .inner {
     max-width: 1280px;
     flex-direction: row;
     display: flex;
-
     min-height: 100vh;
     align-items: center;
   }
-.addBtnCircle {
-  width: 62px;
-  height: 52px;
-}
- .right {
-  background-color: #f5f6fb;
-  background-image: url("../../assets/img/leaf-img2x.webp");
-  background-repeat: no-repeat;
 
-  background-size: 150% 105vh;
-  background-position: 30% 25%;  
+  .addBtnCircle {
+    width: 62px;
+    height: 52px;
+  }
 
-  display: flex;
-  justify-content: flex-start;
-  align-items: flex-start;
-}
+  .right {
+    flex: 1 1 auto;
+    position: relative;
+    margin-top: -250px;
+    padding-top: 110px;
+    min-height: calc(100vh + 250px);
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    background-color: #f5f6fb;
+    background-image: url("../../assets/img/leaf-img2x.webp");
+    background-repeat: no-repeat;
+    background-position: 30% 50%;
+    background-size: 180% 105vh;
+  }
 
   .summaryBox {
     background: transparent;
     padding: 220px 48px;
     margin-top: 0;
-    width: 480px;
+    max-width: 450px;
+    width: 100%;
     height: 100vh;
   }
- 
+
   .form {
-    margin-bottom: 32px;  
+    margin-bottom: 32px;
   }
-  
-    .tableWrapper {
-    height: 420px;              
+
+  .tableWrapper {
+    height: 420px;
     max-height: none;
-    overflow-y: auto !important; 
+    overflow-y: auto !important;
     overflow-x: hidden;
   }
+
   .dateRow {
     margin-bottom: 40px;
   }
