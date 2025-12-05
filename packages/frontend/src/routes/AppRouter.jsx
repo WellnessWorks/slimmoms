@@ -10,7 +10,7 @@ import RestrictedRoute from "./RestrictedRoute";
 import Loader from "../components/Loader/Loader"; // 🔥 Loader import
 
 // Lazy-loaded sayfalar
-const MainPage = React.lazy(() => import("../pages/MainPage/MainPage"));
+const LandingPage = React.lazy(() => import("../pages/LandingPage/LandingPage"));
 const LoginPage = React.lazy(() => import("../pages/LoginPage/LoginPage"));
 const RegistrationPage = React.lazy(() =>
   import("../pages/RegistrationPage/RegistrationPage")
@@ -40,7 +40,7 @@ const AppRouter = () => {
               index
               element={
                 <RestrictedRoute>
-                  <MainPage />
+                  <LandingPage />
                 </RestrictedRoute>
               }
             />
