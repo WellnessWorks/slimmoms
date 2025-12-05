@@ -11,7 +11,7 @@ const FormInput = ({ id, label, type, placeholder, register, error }) => (
       id={id}
       placeholder={placeholder}
       {...register}
-      className={css.formInput}
+      className={`${css.formInput} ${error ? css.formInputError : ""}`}
     />
     {error && <p className={css.authErrorMessage}>{error}</p>}
   </div>

@@ -1,5 +1,7 @@
 .header {
   border-bottom: 2px solid var(--light-gray);
+  z-index: 10001;
+  position: relative;
 }
 
 .headerWrapper {
@@ -173,6 +175,10 @@
     display: flex;
     align-items: center;
   }
+
+  .header {
+    z-index: 10;
+  }
 }
 
 @media (min-width: 1280px) {
@@ -181,7 +187,6 @@
     background-color: transparent;
     padding-top: 80px;
     width: 100%;
-    z-index: 50;
   }
 
   .headerWrapper {
