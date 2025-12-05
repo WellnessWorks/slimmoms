@@ -23,11 +23,19 @@ const shuffleArray = (array) => {
   return newArray;
 };
 
-const mapBloodGroup = (bloodTypeString) => {
-  const bloodGroup = Number(bloodTypeString);
-  if (bloodGroup >= 1 && bloodGroup <= 4) {
-    return bloodGroup;
+const mapBloodGroup = (bloodType) => {
+  // API numeric mapping for ABO: 1=A, 2=B, 3=AB, 4=0
+  const stringToNumberMap = { A: 1, B: 2, AB: 3, 0: 4 };
+
+  const numericBloodGroup = Number(bloodType);
+  if ([1, 2, 3, 4].includes(numericBloodGroup)) {
+    return numericBloodGroup;
   }
+
+  if (stringToNumberMap[bloodType]) {
+    return stringToNumberMap[bloodType];
+  }
+
   return null;
 };
 
