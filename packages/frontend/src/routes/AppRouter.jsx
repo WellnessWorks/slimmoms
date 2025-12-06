@@ -53,7 +53,7 @@ const AppRouter = () => {
             <Route
               path="register"
               element={
-                <RestrictedRoute redirectTo="/login">
+                <RestrictedRoute redirectTo="/calculator">
                   <RegistrationPage />
                 </RestrictedRoute>
               }
@@ -82,5 +82,4 @@ const AppRouter = () => {
     </HashRouter>
   );
 };
-
 export default AppRouter;
