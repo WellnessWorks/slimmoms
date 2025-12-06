@@ -95,14 +95,43 @@ export const register = createAsyncThunk(
 // LOGOUT
 export const logOut = createAsyncThunk("auth/logout", async (_, thunkAPI) => {
   try {
-    await userTransactionApi.post("/api/v1/auth/logout");
-  } catch (error) {
-    return handleAuthError(error, thunkAPI);
-  } finally {
+    const refreshToken = localStorage.getItem("refreshToken");
+
+    // Eğer token yoksa, direkt temizle ve reject et
+    if (!refreshToken) {
+      // cleanup yine yapılıyor
+      removeToken();
+      localStorage.removeItem("token");
+      localStorage.removeItem("refreshToken");
+      localStorage.removeItem("email");
+      return thunkAPI.rejectWithValue("No refresh token found");
+    }
+
+    // backend'in /api/v1 prefıx'i userTransactionApi içinde tanımlıysa sadece '/auth/logout' yaz
+    await userTransactionApi.post(
+      "/api/v1/auth/logout",
+      { refreshToken },
+      {
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+
+    // logout başarılı (server 204 No Content ya da 200 dönmüş olabilir)
+    // temizleme:
     removeToken();
     localStorage.removeItem("token");
     localStorage.removeItem("refreshToken");
     localStorage.removeItem("email");
+
+    return; // başarılı dönüş
+  } catch (error) {
+    // cleanup yine yap (aynı davranışı sürdürmek istiyorsan)
+    removeToken();
+    localStorage.removeItem("token");
+    localStorage.removeItem("refreshToken");
+    localStorage.removeItem("email");
+
+    return handleAuthError(error, thunkAPI);
   }
 });
 
