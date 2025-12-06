@@ -10,7 +10,9 @@ import RestrictedRoute from "./RestrictedRoute";
 import Loader from "../components/Loader/Loader"; // 🔥 Loader import
 
 // Lazy-loaded sayfalar
-const LandingPage = React.lazy(() => import("../pages/LandingPage/LandingPage"));
+const LandingPage = React.lazy(() =>
+  import("../pages/LandingPage/LandingPage")
+);
 const LoginPage = React.lazy(() => import("../pages/LoginPage/LoginPage"));
 const RegistrationPage = React.lazy(() =>
   import("../pages/RegistrationPage/RegistrationPage")
@@ -19,9 +21,7 @@ const Layout = React.lazy(() => import("../pages/Layout/Layout"));
 const AuthCalculatorPage = React.lazy(() =>
   import("../pages/AuthCalculatorPage/AuthCalculatorPage")
 );
-const DiaryPage = React.lazy(() =>
-  import("../pages/DiaryPage/DiaryPage")
-);
+const DiaryPage = React.lazy(() => import("../pages/DiaryPage/DiaryPage"));
 
 const AppRouter = () => {
   const dispatch = useDispatch();
@@ -52,7 +52,7 @@ const AppRouter = () => {
             <Route
               path="register"
               element={
-                <RestrictedRoute redirectTo="/login">
+                <RestrictedRoute redirectTo="/calculator">
                   <RegistrationPage />
                 </RestrictedRoute>
               }
