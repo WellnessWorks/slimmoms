@@ -1,7 +1,7 @@
 // src/components/AppRouter.jsx
 import React, { useEffect, Suspense } from "react";
 import { useDispatch } from "react-redux";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { HashRouter, Routes, Route } from "react-router-dom";
 import { refreshUser } from "../redux/auth/authOperations";
 
 import PrivateRoute from "./PrivateRoute";
@@ -31,7 +31,8 @@ const AppRouter = () => {
   }, [dispatch]);
 
   return (
-    <BrowserRouter basename="/slimmoms">
+    // HashRouter kullanımı GH Pages üzerinde F5/yenileme 404 sorununu ortadan kaldırır.
+    <HashRouter>
       <Suspense fallback={<Loader full size={60} />}>
         <Routes>
           {/* Tüm sayfalar Layout altında */}
@@ -78,7 +79,7 @@ const AppRouter = () => {
           </Route>
         </Routes>
       </Suspense>
-    </BrowserRouter>
+    </HashRouter>
   );
 };
 
