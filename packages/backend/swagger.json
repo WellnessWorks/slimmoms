@@ -3,7 +3,7 @@
   "info": {
     "title": "SlimMom Diet App API",
     "version": "1.0.0",
-    "description": "GoIT Final Team Project - Backend API Documentation."
+    "description": "Backend API documentation for the SlimMom diet and calorie tracking application."
   },
   "servers": [
     {
@@ -21,7 +21,7 @@
         "type": "http",
         "scheme": "bearer",
         "bearerFormat": "JWT",
-        "description": "Access Token (Authorization: Bearer <token>)"
+        "description": "Use Access Token in header: Authorization: Bearer <token>"
       }
     },
     "schemas": {
@@ -39,28 +39,32 @@
           "weight": {
             "type": "number",
             "example": 75,
-            "description": "Mevcut kilo (kg)"
+            "description": "Current weight in kilograms."
           },
           "height": {
             "type": "number",
             "example": 180,
-            "description": "Boy (cm)"
+            "description": "Height in centimeters."
           },
-          "age": { "type": "number", "example": 30, "description": "Yaş" },
+          "age": {
+            "type": "number",
+            "example": 30,
+            "description": "User age."
+          },
           "activityLevel": {
             "type": "number",
             "example": 1.5,
-            "description": "Aktivite Katsayısı (1.2-1.9)"
+            "description": "Daily activity factor (Range: 1.2–1.9)."
           },
           "targetWeight": {
             "type": "number",
             "example": 65,
-            "description": "Hedef kilo (kg)"
+            "description": "Goal weight in kilograms."
           },
           "bloodGroup": {
             "type": "number",
             "example": 2,
-            "description": "Kan Grubu (1-4)"
+            "description": "Blood group number (1–4)."
           }
         }
       }
@@ -69,23 +73,29 @@
   "tags": [
     {
       "name": "Auth",
-      "description": "Kullanıcı Kimlik Doğrulama ve Oturum Yönetimi"
+      "description": "User authentication and session management."
     },
     {
       "name": "Users",
-      "description": "Kullanıcı Profili Bilgilerini Alma ve Güncelleme"
+      "description": "Retrieve and update user profile information."
     },
-    { "name": "Calories", "description": "Günlük Kalori İhtiyacı Hesaplama" },
+    {
+      "name": "Calories",
+      "description": "Daily calorie intake calculation."
+    },
     {
       "name": "DayLog",
-      "description": "Günlük Yiyecek Tüketim Kaydı (Ekleme, Silme, Özet)"
+      "description": "Daily food consumption logs (add, remove, summary)."
     },
-    { "name": "Products", "description": "Yiyecek Ürünlerini Arama" }
+    {
+      "name": "Products",
+      "description": "Search food products."
+    }
   ],
   "paths": {
     "/auth/register": {
       "post": {
-        "summary": "Yeni Kullanıcı Kaydı",
+        "summary": "Register a New User",
         "tags": ["Auth"],
         "requestBody": {
           "required": true,
@@ -105,21 +115,25 @@
                     "format": "password",
                     "example": "SecurePass123"
                   },
-                  "name": { "type": "string", "example": "John Doe" }
+                  "name": {
+                    "type": "string",
+                    "example": "John Doe"
+                  }
                 }
               }
             }
           }
         },
         "responses": {
-          "201": { "description": "Kullanıcı başarıyla kaydedildi." },
-          "409": { "description": "E-posta adresi zaten kullanılıyor." }
+          "201": { "description": "User successfully registered." },
+          "409": { "description": "Email already exists." }
         }
       }
     },
+
     "/auth/login": {
       "post": {
-        "summary": "Kullanıcı Girişi ve Token Alma",
+        "summary": "Login and Get Tokens",
         "tags": ["Auth"],
         "requestBody": {
           "required": true,
@@ -146,7 +160,7 @@
         },
         "responses": {
           "200": {
-            "description": "Başarılı giriş. Access ve Refresh token'lar döndürülür.",
+            "description": "Login successful. Returns Access and Refresh tokens.",
             "content": {
               "application/json": {
                 "schema": {
@@ -159,13 +173,14 @@
               }
             }
           },
-          "401": { "description": "Geçersiz e-posta veya şifre." }
+          "401": { "description": "Invalid email or password." }
         }
       }
     },
+
     "/auth/logout": {
       "post": {
-        "summary": "Oturumdan Çıkış Yapma",
+        "summary": "Log Out",
         "tags": ["Auth"],
         "requestBody": {
           "required": true,
@@ -175,21 +190,25 @@
                 "type": "object",
                 "required": ["refreshToken"],
                 "properties": {
-                  "refreshToken": { "type": "string", "example": "eyJhbGc..." }
+                  "refreshToken": {
+                    "type": "string",
+                    "example": "eyJhbGc..."
+                  }
                 }
               }
             }
           }
         },
         "responses": {
-          "204": { "description": "Başarılı çıkış (No Content)." },
-          "404": { "description": "Oturum bulunamadı." }
+          "204": { "description": "Logout successful." },
+          "404": { "description": "Session not found." }
         }
       }
     },
+
     "/auth/refresh": {
       "post": {
-        "summary": "Access Token'ı Yenileme",
+        "summary": "Refresh Access Token",
         "tags": ["Auth"],
         "requestBody": {
           "required": true,
@@ -199,7 +218,10 @@
                 "type": "object",
                 "required": ["refreshToken"],
                 "properties": {
-                  "refreshToken": { "type": "string", "example": "eyJhbGc..." }
+                  "refreshToken": {
+                    "type": "string",
+                    "example": "eyJhbGc..."
+                  }
                 }
               }
             }
@@ -207,24 +229,26 @@
         },
         "responses": {
           "200": {
-            "description": "Yeni Access ve Refresh token çifti döndürülür."
+            "description": "New Access and Refresh token pair returned."
           },
-          "401": { "description": "Geçersiz veya süresi dolmuş Refresh Token." }
+          "401": { "description": "Invalid or expired Refresh Token." }
         }
       }
     },
+
     "/users/me": {
       "get": {
-        "summary": "Kullanıcının Kendi Profil Bilgilerini Alma",
+        "summary": "Get Current User Profile",
         "tags": ["Users"],
         "responses": {
-          "200": { "description": "Kullanıcının güncel profil verileri." }
+          "200": { "description": "Returns the user's profile data." }
         }
       }
     },
+
     "/users/update": {
       "patch": {
-        "summary": "Kullanıcı Profil Bilgilerini Güncelleme",
+        "summary": "Update User Profile",
         "tags": ["Users"],
         "requestBody": {
           "required": true,
@@ -241,55 +265,54 @@
           }
         },
         "responses": {
-          "200": { "description": "Profil başarıyla güncellendi." }
+          "200": { "description": "Profile updated successfully." }
         }
       }
     },
+
     "/calories/intake": {
       "post": {
-        "summary": "Herkese Açık Günlük Kalori İhtiyacını Hesaplama",
+        "summary": "Calculate Daily Calorie Needs (Public)",
         "tags": ["Calories"],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CalorieInput"
-              }
+              "schema": { "$ref": "#/components/schemas/CalorieInput" }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Hesaplanan kalori oranı ve yasaklı yiyecek listesi."
+            "description": "Returns calculated calorie intake and restricted food list."
           }
         }
       }
     },
+
     "/calories/private-intake": {
       "post": {
-        "summary": "Korumalı Hesaplama ve Kalori Hedefini Kullanıcıya Kaydetme",
+        "summary": "Calculate and Save Daily Calorie Goal (Protected)",
         "tags": ["Calories"],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CalorieInput"
-              }
+              "schema": { "$ref": "#/components/schemas/CalorieInput" }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Hesaplanan değerler döndürülür ve `dailyCalorieGoal` profile kaydedilir."
+            "description": "Returns calculated values and saves dailyCalorieGoal to profile."
           }
         }
       }
     },
+
     "/day/add-product": {
       "post": {
-        "summary": "Günlük Tüketime Ürün Ekleme",
+        "summary": "Add Product to Daily Consumption",
         "tags": ["DayLog"],
         "requestBody": {
           "required": true,
@@ -307,12 +330,12 @@
                   "productId": {
                     "type": "string",
                     "example": "60c72b0f9f1b4c001f8e4d2a",
-                    "description": "Product ID"
+                    "description": "Product ID."
                   },
                   "weight": {
                     "type": "number",
                     "example": 150,
-                    "description": "Tüketilen miktar (gram)"
+                    "description": "Consumed amount in grams."
                   }
                 }
               }
@@ -321,14 +344,15 @@
         },
         "responses": {
           "201": {
-            "description": "Ürün başarıyla eklendi, güncel kayıt döndürülür."
+            "description": "Product added successfully. Returns updated daily record."
           }
         }
       }
     },
+
     "/day/delete-product": {
       "delete": {
-        "summary": "Günlük Tüketimden Ürün Silme",
+        "summary": "Delete Product from Daily Consumption",
         "tags": ["DayLog"],
         "requestBody": {
           "required": true,
@@ -341,7 +365,7 @@
                   "consumedProductId": {
                     "type": "string",
                     "example": "60c72b0f9f1b4c001f8e4d2b",
-                    "description": "Tüketim kaydının alt ID'si"
+                    "description": "ID of consumed product record."
                   }
                 }
               }
@@ -350,44 +374,46 @@
         },
         "responses": {
           "200": {
-            "description": "Ürün başarıyla silindi ve toplam kalori güncellendi."
+            "description": "Product deleted and total calories updated."
           }
         }
       }
     },
+
     "/day/info": {
       "get": {
-        "summary": "Belirli Bir Güne Ait Tüketim Özetini Alma",
+        "summary": "Get Daily Summary",
         "tags": ["DayLog"],
         "parameters": [
           {
             "in": "query",
             "name": "date",
             "schema": { "type": "string", "format": "date" },
-            "description": "Alınacak gün (YYYY-MM-DD). Opsiyonel."
+            "description": "Date to fetch summary for (YYYY-MM-DD). Optional."
           }
         ],
         "responses": {
           "200": {
-            "description": "Günlük hedef, tüketilen ve kalan kalori özeti."
+            "description": "Returns daily calorie target, consumed calories, and remaining calories."
           }
         }
       }
     },
+
     "/products/search": {
       "get": {
-        "summary": "Ürün Adına Göre Arama",
+        "summary": "Search Products by Name",
         "tags": ["Products"],
         "parameters": [
           {
             "in": "query",
             "name": "query",
             "schema": { "type": "string", "required": true },
-            "description": "Aranacak ürün adı (Örn: 'elma', 'süt')."
+            "description": "Product name to search (e.g., 'apple', 'milk')."
           }
         ],
         "responses": {
-          "200": { "description": "Arama sonuçları listesi." }
+          "200": { "description": "Returns list of matching products." }
         }
       }
     }

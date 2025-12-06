@@ -3,11 +3,19 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/WellnessWorks/slimmoms.git"
+  },
+  "homepage": "https://WellnessWorks.github.io/slimmoms/",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist",
+    "postbuild": "cp -f dist/index.html dist/404.html"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -30,6 +38,7 @@
     "eslint": "^9.39.1",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.24",
+    "gh-pages": "^5.0.0",
     "globals": "^16.5.0",
     "vite": "^7.2.4"
   }

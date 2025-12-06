@@ -28,23 +28,30 @@ const app = express();
 
 // CORS Ayarları
 // Localhost için ve Vercel frontend için izin ver
+const whitelist = [
+  "https://slimmoms-frontend.vercel.app",
+  "http://localhost:5173",
+  "https://wellnessworks.github.io",
+  "https://wellnessworks.github.io/slimmoms",
+];
+
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Eğer origin yoksa (Postman veya SSR) izin ver
-      if (!origin) return callback(null, true);
+      if (!origin) return callback(null, true); // Postman, SSR vb.
 
-      // İzin verilen production frontend domain
-      const whitelist = ["https://slimmoms-frontend.vercel.app", "http://localhost:5173"];
+      // Trailing slash sorununu engelle
+      const cleanOrigin = origin.replace(/\/$/, "");
 
-      if (whitelist.includes(origin)) {
-        return callback(null, true); // İzin ver
+      if (whitelist.includes(cleanOrigin)) {
+        return callback(null, true);
       }
 
-      // İzin yoksa preflight request'i engelleme
-      return callback(null, false);
+      return callback(new Error("CORS blocked: origin not allowed"), false);
     },
-    credentials: true, // Cookie veya auth header kullanıyorsan gerekli
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
   })
 );
 
@@ -90,10 +97,10 @@ mongoose
     console.log("✅ MongoDB Connection Successful!");
     const port = PORT || 4000;
     app.listen(port, () => {
-    console.log(`🚀 Backend Server running at http://localhost:${port}`);
+      console.log(`🚀 Backend Server running at http://localhost:${port}`);
     });
   })
   .catch((error) => {
     console.error("❌ MongoDB Connection Error:", error.message);
     process.exit(1);
-});
+  });
